@@ -1,0 +1,205 @@
+{
+  "dimensiones": [
+    {
+      "id": "1",
+      "nombre": "IMPULSORES CULTURALES",
+      "principios": [
+        {
+          "nombre": "Respetar a Cada Individuo",
+          "comportamientos": [
+            {
+              "nombre": "Soporte",
+              "descripcion": "Invertimos en el desarrollo de todos y los alentamos a maximizar su potencial."
+            },
+            {
+              "nombre": "Reconocer",
+              "descripcion": "Honramos las contribuciones de cada empleado."
+            },
+            {
+              "nombre": "Comunidad",
+              "descripcion": "Nuestra organización se preocupa por la comunidad al proporcionar un lugar de trabajo seguro, física y emocionalmente para los empleados, y ser un buen administrador del medio ambiente."
+            }
+          ]
+        },
+        {
+          "nombre": "Liderar con Humildad",
+          "comportamientos": [
+            {
+              "nombre": "Liderazgo de servidor",
+              "descripcion": "Los líderes consideran primero las necesidades de los demás."
+            },
+            {
+              "nombre": "Valorar",
+              "descripcion": "Reconocemos nuestras fortalezas y debilidades, reconocemos nuestros errores y buscamos constantemente aprender de los demás."
+            },
+            {
+              "nombre": "Empoderar",
+              "descripcion": "Delegamos la toma de decisiones cuando sea apropiado, confiamos y nos apoyamos mutuamente."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "nombre": "MEJORA CONTINUA",
+      "principios": [
+        {
+          "nombre": "Buscar la Perfección",
+          "comportamientos": [
+            {
+              "nombre": "Mentalidad",
+              "descripcion": "Desafiamos nuestros paradigmas y expectativas."
+            },
+            {
+              "nombre": "Estructura",
+              "descripcion": "Abordamos la mejora de forma estructurada."
+            }
+          ]
+        },
+        {
+          "nombre": "Abrazar el pensamiento Cientifico",
+          "comportamientos": [
+            {
+              "nombre": "Reflexionar",
+              "descripcion": "Entendemos que las decisiones y los cambios se basan en un examen cuidadoso de los problemas, desafíos y oportunidades."
+            },
+            {
+              "nombre": "Análisis",
+              "descripcion": "Experimentamos, innovamos y tomamos decisiones con un análisis apropiado de buenos datos y hechos."
+            },
+            {
+              "nombre": "Colaborar",
+              "descripcion": "Buscamos activamente ideas y mejoras, especialmente de las personas más cercanas al trabajo."
+            }
+          ]
+        },
+        {
+          "nombre": "Enfocarse en el proceso",
+          "comportamientos": [
+            {
+              "nombre": "Comprender",
+              "descripcion": "Vamos a donde sucede el trabajo para desarrollar una comprensión exhaustiva del proceso."
+            },
+            {
+              "nombre": "Diseño",
+              "descripcion": "Diseñamos nuestros procesos para minimizar el desperdicio."
+            },
+            {
+              "nombre": "Atribución",
+              "descripcion": "Primero miramos el proceso al resolver un problema en lugar de culpar a las personas."
+            }
+          ]
+        },
+        {
+          "nombre": "Asegurar la Calidad en la Fuente",
+          "comportamientos": [
+            {
+              "nombre": "A prueba de error",
+              "descripcion": "Nuestros procesos están diseñados para prevenir, revelar y resolver de inmediato cualquier problema."
+            },
+            {
+              "nombre": "Propiedad",
+              "descripcion": "Los empleados se sienten conectados personalmente con la calidad de sus procesos y resultados de trabajo."
+            },
+            {
+              "nombre": "Conectar",
+              "descripcion": "Nos aseguramos de que las personas puedan ver cómo su trabajo impacta el trabajo de los demás."
+            }
+          ]
+        },
+        {
+          "nombre": "Mejorar el Flujo y Jalón de Valor",
+          "comportamientos": [
+            {
+              "nombre": "Ininterrumpido",
+              "descripcion": "Diseñamos nuestro trabajo hacia la creación continua de valor."
+            },
+            {
+              "nombre": "Demanda",
+              "descripcion": "Producimos en respuesta a la demanda real del cliente."
+            },
+            {
+              "nombre": "Eliminar",
+              "descripcion": "Buscamos sistemáticamente formas de identificar y eliminar los desperdicios de nuestros procesos."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "nombre": "ALINEAMIENTO EMPRESARIAL",
+      "principios": [
+        {
+          "nombre": "Pensar Sistémicamente",
+          "comportamientos": [
+            {
+              "nombre": "Optimizar",
+              "descripcion": "Consideramos cómo las mejoras en nuestra área deben alinearse con las mejoras en toda la organización."
+            },
+            {
+              "nombre": "Impacto",
+              "descripcion": "Sabemos cómo nuestro trabajo impacta el trabajo de los demás."
+            }
+          ]
+        },
+        {
+          "nombre": "Crear Constancia de Propósito",
+          "comportamientos": [
+            {
+              "nombre": "Alinear",
+              "descripcion": "Nuestro sentido común de propósito impulsa todas nuestras decisiones."
+            },
+            {
+              "nombre": "Aclarar",
+              "descripcion": "Nuestra contribución a la sociedad es tan clara para todos que unifica nuestra organización."
+            },
+            {
+              "nombre": "Comunicar",
+              "descripcion": "Conocemos nuestro propósito de existir y cómo nos unifica, y esto es evidente en nuestras acciones y comunicaciones diarias."
+            }
+          ]
+        },
+        {
+          "nombre": "Crear Valor para el Cliente",
+          "comportamientos": [
+            {
+              "nombre": "Relación",
+              "descripcion": "Construimos relaciones con nuestros clientes para satisfacer y anticipar sus necesidades y alinear nuestros objetivos con ellos."
+            },
+            {
+              "nombre": "Valor",
+              "descripcion": "Investigamos lo que nuestros clientes realmente valoran y lo comunicamos a través de toda la organización."
+            },
+            {
+              "nombre": "Medida",
+              "descripcion": "Medimos para saber dónde estamos en relación con nuestros objetivos."
+            },
+            {
+              "id": "4",
+              "nombre": "RESULTADOS ",
+              "principios": [
+                {
+                  "nombre": "Seguridad/Medio Ambiente/Moral"
+                },
+                {
+                  "nombre": "Satisfacción del Cliente"
+                },
+                {
+                  "nombre": "Calidad"
+                },
+                {
+                  "nombre": "Costo/Productividad"
+                },
+                {
+                  "nombre": "Entregas"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

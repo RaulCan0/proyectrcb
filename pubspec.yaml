@@ -1,0 +1,38 @@
+name: lensysapp
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+# The following section is specific to Flutter.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  supabase_flutter: ^2.9.1
+  shared_preferences: ^2.5.3
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  provider: ^6.1.5
+  image_picker: ^1.1.2
+  fl_chart: ^1.0.0
+  carousel_slider: ^5.1.1
+  convex_bottom_bar: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/logo.webp
