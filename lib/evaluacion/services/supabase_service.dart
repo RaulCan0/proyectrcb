@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'dart:typed_data';
-
-
+import 'dart:io';
 import 'package:lensysapp/evaluacion/models/asociado.dart';
 import 'package:lensysapp/evaluacion/models/calificacion.dart';
 import 'package:lensysapp/evaluacion/models/empresa.dart';
@@ -108,22 +106,13 @@ class SupabaseService {
         evaluacion.asociadoId.isEmpty) {
       throw Exception('Todos los IDs son obligatorios');
     }
-
     final data =
-        await _client
-            .from('detalles_evaluacion')
-            .insert(evaluacion.toMap())
-            .select()
-            .single();
-
+        await _client.from('detalles_evaluacion').insert(evaluacion.toMap()).select().single();
     return Evaluacion.fromMap(data);
   }
 
   Future<void> updateEvaluacion(String id, Evaluacion evaluacion) async {
-    await _client
-        .from('detalles_evaluacion')
-        .update(evaluacion.toMap())
-        .eq('id', id);
+    await _client.from('detalles_evaluacion').update(evaluacion.toMap()).eq('id', id);
   }
 
   Future<void> deleteEvaluacion(String id) async {
@@ -131,9 +120,7 @@ class SupabaseService {
   }
 
   // CALIFICACIONES
-  Future<List<Calificacion>> getCalificacionesPorAsociado(
-    String idAsociado,
-  ) async {
+  Future<List<Calificacion>> getCalificacionesPorAsociado(String idAsociado) async {
     final response = await _client
         .from('calificaciones')
         .select()
@@ -142,41 +129,14 @@ class SupabaseService {
   }
 
   Future<void> addCalificacion(Calificacion calificacion, {required String id, required String idAsociado}) async {
-    try {
-      // Verificación más detallada
-      if (calificacion.id.isEmpty) {
-        throw Exception("ID de calificación vacío");
-      }
-      if (calificacion.idAsociado.isEmpty) {
-        throw Exception("ID de asociado vacío");
-      }
-      if (calificacion.idEmpresa.isEmpty) {
-        throw Exception("ID de empresa vacío");
-      }
-      if (calificacion.idDimension == 0) {
-        throw Exception("ID de dimensión vacío");
-      }
-
-      ("Intentando guardar calificación:");
-      ("ID: ${calificacion.id}");
-      ("ID Asociado: ${calificacion.idAsociado}");
-      ("ID Empresa: ${calificacion.idEmpresa}");
-      ("ID Dimensión: ${calificacion.idDimension}");
-
-      // Si todo está correcto, intentar guardar
-      await _client.from('calificaciones').insert(calificacion.toMap());
-      ("✅ Calificación guardada con éxito");
-    } catch (e) {
-      ("❌ Error al guardar calificación: $e");
-      rethrow; // Re-lanzar para manejar arriba
+    if (calificacion.id.isEmpty || calificacion.idAsociado.isEmpty || calificacion.idEmpresa.isEmpty) {
+      throw Exception('ID de calificación, asociado y empresa son obligatorios');
     }
+    await _client.from('calificaciones').insert(calificacion.toMap());
   }
 
   Future<void> updateCalificacion(String id, int nuevoPuntaje) async {
-    await _client
-        .from('calificaciones')
-        .update({'puntaje': nuevoPuntaje})
-        .eq('id', id);
+    await _client.from('calificaciones').update({'puntaje': nuevoPuntaje}).eq('id', id);
   }
 
   Future<void> deleteCalificacion(String id) async {
@@ -189,21 +149,11 @@ class SupabaseService {
   }
 
   Future<void> updateCalificacionFull(Calificacion calificacion) async {
-    try {
-      await _client
-          .from('calificaciones')
-          .update(calificacion.toMap()) // Asume que Calificacion.toMap() incluye todos los campos necesarios (puntaje, observaciones, sistemas, evidenciaUrl, etc.)
-          .eq('id', calificacion.id);
-      // print("✅ Calificación actualizada completamente con éxito: ${calificacion.id}");
-    } catch (e) {
-      // print("❌ Error al actualizar calificación completa: $e");
-      rethrow;
-    }
+    await _client.from('calificaciones').update(calificacion.toMap()).eq('id', calificacion.id);
   }
 
-  /// Obtiene todas las calificaciones de una empresa
   Future<List<Map<String, dynamic>>> getCalificacionesPorEmpresa(String empresaId) async {
-    final res = await Supabase.instance.client
+    final res = await _client
       .from('calificaciones')
       .select()
       .eq('id_empresa', empresaId)

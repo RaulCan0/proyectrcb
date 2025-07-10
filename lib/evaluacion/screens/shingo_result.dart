@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../widgets/drawer_lensys.dart';
+
 /// Lista de etiquetas por hoja
 const List<String> sheetLabels = [
   'seguridad/medio ambiente/moral',
@@ -50,7 +52,16 @@ class _ShingoResultsScreenState extends State<ShingoResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shingo Prize – Resultados')),
+      appBar: AppBar(
+        title: const Text('Shingo Prize – Resultados'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
+        ],
+      ),
+      endDrawer: const DrawerLensys(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

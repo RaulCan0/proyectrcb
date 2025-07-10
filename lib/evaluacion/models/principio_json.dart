@@ -2,7 +2,7 @@ class PrincipioJson {
   final String nombre;
   final String benchmarkComportamiento;
   final String benchmarkPorNivel;
-  final String nivel;
+  final String cargo;
   final String preguntas;
   final Map<String, String> calificaciones;
   final List<String> comportamientos;
@@ -11,7 +11,7 @@ class PrincipioJson {
     required this.nombre,
     required this.benchmarkComportamiento,
     required this.benchmarkPorNivel,
-    required this.nivel,
+    required this.cargo,
     required this.preguntas,
     required this.calificaciones,
     required this.comportamientos,
@@ -22,7 +22,7 @@ class PrincipioJson {
       nombre: json['PRINCIPIOS'] ?? '',
       benchmarkComportamiento: json['BENCHMARK DE COMPORTAMIENTOS'] ?? '',
       benchmarkPorNivel: json['BENCHMARK POR NIVEL'] ?? '',
-      nivel: json['NIVEL'] ?? '',
+      cargo: json['CARGO'] ?? '',
       preguntas: json['GUÍA DE PREGUNTAS'] ?? '',
       calificaciones: {
         'C1': json['C1'] ?? '',

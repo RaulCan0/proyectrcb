@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
+import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 import 'tablas_principios_widget.dart';
 
 class TablasDimensionScreen extends StatefulWidget {
@@ -64,16 +65,8 @@ class _TablasDimensionScreenState extends State<TablasDimensionScreen> {
               onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
             ),
           ],
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
-            tabs: dimensiones.map((d) => Tab(text: d)).toList(),
-          ),
         ),
-        endDrawer: Drawer(
-          child: Center(child: Text('Drawer')), // Solo UI
-        ),
+        endDrawer: const DrawerLensys(),
         body: Column(
           children: [
             Padding(

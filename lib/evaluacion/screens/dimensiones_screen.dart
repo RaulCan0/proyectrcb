@@ -1,14 +1,20 @@
-// dimensiones_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:lensysapp/custom/appcolors.dart';
+import 'package:lensysapp/evaluacion/models/empresa.dart';
+import 'package:lensysapp/evaluacion/screens/asociado_screen.dart';
+import 'package:lensysapp/evaluacion/screens/shingo_result.dart';
+import 'package:lensysapp/evaluacion/screens/tabla_score_global.dart';
+import 'package:lensysapp/evaluacion/services/progresos_service.dart';
+import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 
 class DimensionesScreen extends StatelessWidget {
-  const DimensionesScreen({super.key});
+  final Empresa empresa;
+  final String evaluacionId;
+
+  const DimensionesScreen({super.key, required this.empresa, required this.evaluacionId, required String empresaId});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> dimensiones = const [
+    final List<Map<String, dynamic>> dimensiones = [
       {
         'id': '1',
         'nombre': 'IMPULSORES CULTURALES',
@@ -25,44 +31,118 @@ class DimensionesScreen extends StatelessWidget {
         'id': '3',
         'nombre': 'ALINEAMIENTO EMPRESARIAL',
         'icono': Icons.business,
-        'color': AppColors.d1, // Use the correct static const from AppColors
+        'color': Colors.red,
+      },
+      {
+        'id': '4',
+        'nombre': 'RESULTADOS',
+        'icono': Icons.show_chart,
+        'color': const Color.fromARGB(255, 28, 50, 71),
+        'navigate': (BuildContext context) => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ShingoResultsScreen()),
+            ),
+      },
+      {
+        'id': '5',
+        'nombre': 'EVALUACION FINAL',
+        'icono': Icons.score,
+        'color': const Color.fromARGB(255, 5, 10, 14),
+        'navigate': (BuildContext context) => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TablaScoreGlobal()),
+            ),
       },
     ];
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 35, 47, 112),
+        backgroundColor: const Color(0xFF003056),
         centerTitle: true,
-        title: const Text('Dimensiones'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          'Dimensiones - ${empresa.nombre}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
+        ],
       ),
+      endDrawer: const DrawerLensys(),
       body: ListView.builder(
         itemCount: dimensiones.length,
         itemBuilder: (context, index) {
           final dimension = dimensiones[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          if (index < 3) {
+            // Solo las primeras 3 muestran progreso
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               child: ListTile(
-                leading: Icon(
-                  dimension['icono'],
-                  color: dimension['color'],
-                  size: 36,
-                ),
-                title: Text(
-                  dimension['nombre'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                leading: Icon(dimension['icono'], color: dimension['color']),
+                title: Text(dimension['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: FutureBuilder<double>(
+                  future: ProgresosService().progresoDimension(
+                    empresaId: empresa.id,
+                    dimensionId: dimension['id'],
                   ),
+                  builder: (context, snapshot) {
+                    final progreso = (snapshot.data ?? 0.0).clamp(0.0, 1.0);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: progreso,
+                          minHeight: 8,
+                          backgroundColor: Colors.grey[300],
+                          color: dimension['color'],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${(progreso * 100).toStringAsFixed(1)}% completado',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                onTap: () {},
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AsociadoScreen(
+                        empresa: empresa,
+                        dimensionId: dimension['id'],
+                        evaluacionId: evaluacionId,
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
+            );
+          } else {
+            // Las otras solo navegan
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              child: ListTile(
+                leading: Icon(dimension['icono'], color: dimension['color']),
+                title: Text(dimension['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                onTap: () => dimension['navigate'](context),
+              ),
+            );
+          }
         },
       ),
     );

@@ -5,11 +5,11 @@ class Empresa {
   final String nombre;
   final String tamano;
   final int empleadosTotal;
-  final List<String> empleadosAsociados;
+  final List<dynamic> empleadosAsociados;
   final String unidades;
   final int areas;
   final String sector;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   Empresa({
     required this.id,
@@ -20,31 +20,22 @@ class Empresa {
     required this.unidades,
     required this.areas,
     required this.sector,
-    required this.createdAt,
+    this.createdAt,
   });
 
   factory Empresa.fromMap(Map<String, dynamic> map) {
-    List<String> asociados = [];
-    if (map['empleados_asociados'] is List) {
-      asociados = List<String>.from(map['empleados_asociados']);
-    } else if (map['empleados_asociados'] is String && map['empleados_asociados'].isNotEmpty) {
-      try {
-        asociados = List<String>.from(jsonDecode(map['empleados_asociados']));
-      } catch (_) {
-        asociados = [];
-      }
-    }
-
     return Empresa(
-      id: map['id']?.toString() ?? '',
-      nombre: map['nombre']?.toString() ?? '',
-      tamano: map['tamano']?.toString() ?? '',
-      empleadosTotal: map['empleados_total'] is int ? map['empleados_total'] : int.tryParse(map['empleados_total']?.toString() ?? '0') ?? 0,
-      empleadosAsociados: asociados,
-      unidades: map['unidades']?.toString() ?? '',
-      areas: map['areas'] is int ? map['areas'] : int.tryParse(map['areas']?.toString() ?? '0') ?? 0,
-      sector: map['sector']?.toString() ?? '',
-      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at'].toString()) : DateTime.now(),
+      id: map['id'] as String,
+      nombre: map['nombre'] as String,
+      tamano: map['tamano'] as String,
+      empleadosTotal: map['empleados_total'] as int,
+      empleadosAsociados: map['empleados_asociados'] is String
+          ? jsonDecode(map['empleados_asociados'])
+          : (map['empleados_asociados'] ?? []),
+      unidades: map['unidades'] as String,
+      areas: map['areas'] as int,
+      sector: map['sector'] as String,
+      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
     );
   }
 
@@ -57,6 +48,6 @@ class Empresa {
         'unidades': unidades,
         'areas': areas,
         'sector': sector,
-        'created_at': createdAt.toIso8601String(),
+        'created_at': createdAt?.toIso8601String(),
       };
 }

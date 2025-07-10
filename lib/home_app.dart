@@ -27,12 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pushReplacementNamed(context, '/loader');
       }
     } else if (index == 2) {
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const PerfilScreen()),
       );
+      setState(() {
+        _selectedIndex = 1;
+      });
     }
-  }
+    }
+
 
   void _scrollLeft() {
     final newOffset = (_scrollController.offset - 200).clamp(
@@ -61,7 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
-    final themeProvider = context.watch<ThemeProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+    final textSizeProvider = Provider.of<TextSizeProvider>(context, listen: true);
 
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
@@ -94,12 +99,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         user?.email ?? 'Sin email',
-                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: textSizeProvider.fontSize + 3,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Roboto',
+                        ),
                       ),
                       const SizedBox(height: 4),
                       const Text(
                         'Bienvenido',
-                        style: TextStyle(color: Colors.white70, fontSize: 15),
+                        style: TextStyle(color: Colors.white70, fontSize: 15, fontFamily: 'Roboto'),
                       ),
                     ],
                   )
@@ -210,6 +220,8 @@ class _DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textSizeProvider = Provider.of<TextSizeProvider>(context, listen: true);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -223,14 +235,27 @@ class _DashboardCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 60, color: Colors.black87),
+            if (title == 'Diagnóstico')
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    'assets/shingomodel.webp',
+                    fit: BoxFit.contain,
+                    width: double.infinity,
+                  ),
+                ),
+              )
+            else
+              Icon(icon, size: 60, color: Colors.black87),
             const SizedBox(height: 20),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 20,
+              style: TextStyle(
+                fontSize: textSizeProvider.fontSize + 5,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
+                fontFamily: 'Roboto',
               ),
               textAlign: TextAlign.center,
             ),

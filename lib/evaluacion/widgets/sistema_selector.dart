@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lensysapp/custom/appcolors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SistemasScreen extends StatefulWidget {
@@ -249,7 +250,7 @@ class _SistemasScreenState extends State<SistemasScreen> {
       height: 380.0,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 35, 47, 112),
+          backgroundColor: AppColors.primary,
           automaticallyImplyLeading: false,
           elevation: 0,
           title: TextField(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
+import 'package:lensysapp/evaluacion/models/empresa.dart';
 import 'package:lensysapp/evaluacion/screens/dimensiones_screen.dart';
+import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 
 class EmpresasScreen extends StatelessWidget {
   const EmpresasScreen({super.key});
@@ -21,7 +23,14 @@ class EmpresasScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
+        ],
       ),
+      endDrawer: const DrawerLensys(),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -149,7 +158,19 @@ class EmpresasScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const DimensionesScreen(),
+                  builder: (_) => DimensionesScreen(
+                    empresaId: '',
+                    evaluacionId: '',
+                    empresa: Empresa(
+                      nombre: nombreController.text,
+                      tamano: tamano,
+                      empleadosTotal: int.tryParse(empleadosController.text) ?? 0,
+                      unidades: unidadesController.text,
+                      areas: int.tryParse(areasController.text) ?? 0,
+                      sector: sectorController.text,
+                      createdAt: DateTime.now(), id: '', empleadosAsociados: [],
+                    ),
+                  ),
                 ),
               );
             },

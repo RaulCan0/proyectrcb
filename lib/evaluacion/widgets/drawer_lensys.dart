@@ -1,8 +1,15 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:lensysapp/evaluacion/screens/dashboard_screen.dart';
+import 'package:lensysapp/evaluacion/screens/detalles_evaluacion.dart';
+import 'package:lensysapp/evaluacion/screens/empresas_screen.dart';
+import 'package:lensysapp/evaluacion/screens/historial_screen.dart';
+import 'package:lensysapp/evaluacion/screens/tablas_screen.dart';
+import 'package:lensysapp/perfil.dart';
+import 'package:lensysapp/auth/loader.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 class DrawerLensys extends StatelessWidget {
   const DrawerLensys({super.key});
@@ -25,9 +32,12 @@ class DrawerLensys extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     final userEmail = user?.email ?? 'usuario@ejemplo.com';
+    final textSizeProvider = Provider.of<TextSizeProvider>(context);
+    final double scaleFactor = textSizeProvider.fontSize / 14.0;
+
     return Drawer(
       child: Container(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -38,24 +48,39 @@ class DrawerLensys extends StatelessWidget {
                 final fotoUrl = snapshot.data?['foto_url'];
                 return UserAccountsDrawerHeader(
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 35, 47, 112),
+                    color: Color(0xFF003056),
                   ),
-                  accountName: Text(nombre, style: const TextStyle(fontSize: 18)),
-                  accountEmail: Text(userEmail),
-                  currentAccountPicture: (fotoUrl != null && fotoUrl != '')
-                      ? CircleAvatar(backgroundImage: NetworkImage(fotoUrl))
-                      : const CircleAvatar(
+                  accountName: Text(
+                    nombre,
+                    style: TextStyle(
+                      fontSize: 18 * scaleFactor,
+                      color: Colors.white,
+                    ),
+                  ),
+                  accountEmail: Text(
+                    userEmail,
+                    style: TextStyle(
+                      fontSize: 14 * scaleFactor,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                  ),
+                  currentAccountPicture: (fotoUrl != null && fotoUrl.isNotEmpty)
+                      ? CircleAvatar(backgroundImage: NetworkImage(fotoUrl), radius: 30 * scaleFactor)
+                      : CircleAvatar(
                           backgroundColor: Colors.white,
-                          child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 35, 47, 112)),
+                          radius: 30 * scaleFactor,
+                          child: Icon(
+                            Icons.person,
+                            size: 40 * scaleFactor,
+                            color: const Color(0xFF003056),
+                          ),
                         ),
                 );
               },
             ),
-            // Ejemplo de ListTile, descomenta y ajusta según tus imports y lógica
-            /*
             ListTile(
-              leading: const Icon(Icons.home, color: Colors.black),
-              title: const Text("Inicio"),
+              leading: Icon(Icons.home, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Inicio", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -64,8 +89,103 @@ class DrawerLensys extends StatelessWidget {
                 );
               },
             ),
-            */
-            // ... Agrega aquí el resto de tus ListTile, ajustando los imports y lógica ...
+            ListTile(
+              leading: Icon(Icons.table_chart, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Resultados", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TablasDimensionScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.insert_chart, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Detalle Evaluación", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DetallesEvaluacionScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.history, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Historial", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HistorialScreen(empresas: [], empresasHistorial: [],)),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.manage_accounts, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Ajustes y Perfil", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PerfilScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.dashboard, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Dashboard", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.chat, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text("Chat", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () {
+                Navigator.of(context).pop();
+                // Si tienes un drawer principal, puedes abrirlo aquí si es necesario
+              },
+            ),
+            const Divider(),
+            // Selector de tamaño de letra
+            ListTile(
+              leading: Icon(Icons.text_fields, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
+              title: Text('Letra', style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              trailing: DropdownButton<double>(
+                value: textSizeProvider.fontSize,
+                iconSize: 24 * scaleFactor,
+                items: [
+                  DropdownMenuItem(value: 12.0, child: Text('CH', style: TextStyle(fontSize: 12 * scaleFactor))),
+                  DropdownMenuItem(value: 14.0, child: Text('M', style: TextStyle(fontSize: 14 * scaleFactor))),
+                  DropdownMenuItem(value: 16.0, child: Text('G', style: TextStyle(fontSize: 16 * scaleFactor))),
+                ],
+                onChanged: (size) {
+                  if (size != null) {
+                    textSizeProvider.setOption(size == 12.0
+                        ? TextSizeOption.ch
+                        : size == 14.0
+                            ? TextSizeOption.m
+                            : TextSizeOption.g);
+                  }
+                },
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.red, size: 24 * scaleFactor),
+              title: Text("Cerrar sesión", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              onTap: () async {
+                await Supabase.instance.client.auth.signOut();
+                Navigator.pushAndRemoveUntil(
+                  // ignore: use_build_context_synchronously
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoaderScreen()),
+                  (route) => false,
+                );
+              },
+            ),
           ],
         ),
       ),

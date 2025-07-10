@@ -4,69 +4,54 @@ class Calificacion {
   final String id;
   final String idAsociado;
   final String idEmpresa;
-  final int idDimension;
+  final int? idDimension;
   final String comportamiento;
-  final int puntaje;
-  final DateTime fechaEvaluacion;
+  final int? puntaje;
+  final DateTime? fechaEvaluacion;
   final String? observaciones;
-  final List<String> sistemas;
+  final String? sistemas;
   final String? evidenciaUrl;
 
   Calificacion({
     required this.id,
     required this.idAsociado,
     required this.idEmpresa,
-    required this.idDimension,
+    this.idDimension,
     required this.comportamiento,
-    required this.puntaje,
-    required this.fechaEvaluacion,
+    this.puntaje,
+    this.fechaEvaluacion,
     this.observaciones,
-    required this.sistemas,
+    this.sistemas,
     this.evidenciaUrl,
   });
 
-  String get evaluacionId => id;
-
   factory Calificacion.fromMap(Map<String, dynamic> map) {
-    List<String> sistemasDesdeMapa = [];
-    if (map['sistemas'] is List) {
-      sistemasDesdeMapa = List<String>.from(map['sistemas']);
-    } else if (map['sistemas'] is String && (map['sistemas'] as String).isNotEmpty) {
-      try {
-        sistemasDesdeMapa = List<String>.from(jsonDecode(map['sistemas']));
-      } catch (_) {
-        sistemasDesdeMapa = [];
-      }
-    }
-
     return Calificacion(
-      id: map['id']?.toString() ?? '',
-      idAsociado: map['id_asociado']?.toString() ?? '',
-      idEmpresa: map['id_empresa']?.toString() ?? '',
-      idDimension: map['id_dimension'] is int ? map['id_dimension'] : int.tryParse(map['id_dimension']?.toString() ?? '0') ?? 0,
-      comportamiento: map['comportamiento']?.toString() ?? '',
-      puntaje: map['puntaje'] is int ? map['puntaje'] : int.tryParse(map['puntaje']?.toString() ?? '0') ?? 0,
-      fechaEvaluacion: map['fecha_evaluacion'] != null ? DateTime.parse(map['fecha_evaluacion'].toString()) : DateTime.now(),
-      observaciones: map['observaciones']?.toString(),
-      sistemas: sistemasDesdeMapa,
-      evidenciaUrl: map['evidencia_url']?.toString(),
+      id: map['id'] as String,
+      idAsociado: map['id_asociado'] as String,
+      idEmpresa: map['id_empresa'] as String,
+      idDimension: map['id_dimension'] != null ? int.tryParse(map['id_dimension'].toString()) : null,
+      comportamiento: map['comportamiento'] as String,
+      puntaje: map['puntaje'] != null ? int.tryParse(map['puntaje'].toString()) : null,
+      fechaEvaluacion: map['fecha_evaluacion'] != null ? DateTime.tryParse(map['fecha_evaluacion']) : null,
+      observaciones: map['observaciones'] as String?,
+      sistemas: map['sistemas'] as String?,
+      evidenciaUrl: map['evidencia_url'] as String?,
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'id_asociado': idAsociado,
-      'id_empresa': idEmpresa,
-      'id_dimension': idDimension,
-      'comportamiento': comportamiento,
-      'puntaje': puntaje,
-      'fecha_evaluacion': fechaEvaluacion.toIso8601String(),
-      'observaciones': observaciones,
-      'sistemas': sistemas,
-      'evidencia_url': evidenciaUrl,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'id_asociado': idAsociado,
+        'id_empresa': idEmpresa,
+        'id_dimension': idDimension,
+        'comportamiento': comportamiento,
+        'puntaje': puntaje,
+        'fecha_evaluacion': fechaEvaluacion?.toIso8601String(),
+        'observaciones': observaciones,
+        'sistemas': sistemas,
+        'evidencia_url': evidenciaUrl,
+      };
 
   factory Calificacion.fromJson(String source) {
     return Calificacion.fromMap(json.decode(source) as Map<String, dynamic>);

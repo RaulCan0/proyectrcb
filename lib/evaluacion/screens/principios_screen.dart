@@ -13,7 +13,7 @@ class PrincipiosScreen extends StatefulWidget {
     super.key,
     this.empresa,
     this.asociado,
-    this.dimensionId,
+    this.dimensionId, required String empresaId, required String evaluacionId,
   });
 
   @override
