@@ -1,38 +1,60 @@
+import 'dart:convert';
 
 class Asociado {
   final String id;
   final String nombre;
   final String cargo;
-  final int antiguedad;
-  final String dimensionId;
   final String empresaId;
+  final List<String> empleadosAsociados;
+  final Map<String, double> progresoDimensiones;
+  final Map<String, dynamic> comportamientosEvaluados;
+  final int antiguedad; 
 
   Asociado({
     required this.id,
     required this.nombre,
     required this.cargo,
-    required this.antiguedad,
-    required this.dimensionId,
     required this.empresaId,
+    required this.empleadosAsociados,
+    required this.progresoDimensiones,
+    required this.comportamientosEvaluados,
+    required this.antiguedad,
   });
 
   factory Asociado.fromMap(Map<String, dynamic> map) {
     return Asociado(
-      id: map['id'] as String,
-      nombre: map['nombre'] as String,
-      cargo: map['cargo'] as String,
-      antiguedad: map['antiguedad'] is int ? map['antiguedad'] : int.parse(map['antiguedad'].toString()),
-      dimensionId: map['dimension_id'] as String,
-      empresaId: map['empresa_id'] as String,
+      id: map['id'],
+      nombre: map['nombre'],
+      cargo: map['cargo'],
+      empresaId: map['empresa_id'],
+      empleadosAsociados: map['empleados_asociados'] is String
+          ? List<String>.from(jsonDecode(map['empleados_asociados']))
+          : List<String>.from(map['empleados_asociados'] ?? []),
+      progresoDimensiones: map['progreso_dimensiones'] is String
+          ? Map<String, double>.from(jsonDecode(map['progreso_dimensiones']))
+          : Map<String, double>.from(map['progreso_dimensiones'] ?? {}),
+      comportamientosEvaluados: map['comportamientos_evaluados'] is String
+          ? Map<String, dynamic>.from(jsonDecode(map['comportamientos_evaluados']))
+          : Map<String, dynamic>.from(map['comportamientos_evaluados'] ?? {}),
+      antiguedad: map['antiguedad'] ?? 0, 
     );
   }
 
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'nombre': nombre,
-        'cargo': cargo,
-        'antiguedad': antiguedad,
-        'dimension_id': dimensionId,
-        'empresa_id': empresaId,
-      };
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'cargo': cargo,
+      'empresa_id': empresaId,
+      'empleados_asociados': empleadosAsociados,
+      'progreso_dimensiones': progresoDimensiones,
+      'comportamientos_evaluados': comportamientosEvaluados,
+      'antiguedad': antiguedad,
+    };
+  }
+
+  void limpiarProgreso() {
+    progresoDimensiones.clear();
+    comportamientosEvaluados.clear();
+  }
 }

@@ -17,8 +17,45 @@ class EmpresasScreen extends StatefulWidget {
 }
 
 class _EmpresasScreenState extends State<EmpresasScreen> {
-  final List<Empresa> empresas = [];
+  List<Empresa> empresas = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarEmpresas();
+  }
+
+  Future<void> _cargarEmpresas() async {
+    setState(() => isLoading = true);
+    try {
+      final supabase = Supabase.instance.client;
+      final response = await supabase.from('empresas').select();
+      empresas = (response as List)
+          .map((e) => Empresa.fromMap(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar empresas: $e')),
+        );
+      }
+    }
+    setState(() => isLoading = false);
+  }
+
+  Future<void> _finalizarEvaluacion() async {
+    setState(() {
+      empresas.clear();
+    });
+    // Si quieres borrar también en Supabase, descomenta esto:
+    // final supabase = Supabase.instance.client;
+    // await supabase.from('empresas').delete().neq('id', '');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Evaluación finalizada y UI limpiada')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,56 +81,66 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
         ],
       ),
       endDrawer: const DrawerLensys(),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Bienvenido',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black54,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Bienvenido',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HistorialScreen(
+                              empresas: empresas,
+                              empresasHistorial: const [],
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text('HISTORIAL'),
+                    ),
+                    const SizedBox(height: 20),
+                    if (empresaCreada != null)
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DimensionesScreen(
+                                empresaId: empresaCreada.id,
+                                evaluacionId: const Uuid().v4(),
+                                empresa: empresaCreada,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text('Evaluar ${empresaCreada.nombre}'),
+                      ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _finalizarEvaluacion,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      child: const Text('Finalizar Evaluación'),
+                    ),
+                  ],
                 ),
               ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HistorialScreen(
-                    empresas: empresas,
-                    empresasHistorial: const [],
-                    ),
-                  ),
-                  );
-                },
-                child: const Text('HISTORIAL'),
-                ),
-              const SizedBox(height: 20),
-              if (empresaCreada != null)
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => DimensionesScreen(
-                          empresaId: empresaCreada.id,
-                          evaluacionId: const Uuid().v4(),
-                          empresa: empresaCreada,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text('Evaluar ${empresaCreada.nombre}'),
-                ),
-            ],
-          ),
-        ),
-      ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _mostrarDialogoNuevaEmpresa(context);
@@ -195,20 +242,9 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
                   createdAt: DateTime.now(),
                   empleadosAsociados: [],
                 );
-                // Guardar en Supabase
                 try {
                   final supabase = Supabase.instance.client;
-                  await supabase.from('empresas').insert({
-                    'id': nuevaEmpresa.id,
-                    'nombre': nuevaEmpresa.nombre,
-                    'tamano': nuevaEmpresa.tamano,
-                    'empleados_total': nuevaEmpresa.empleadosTotal,
-                    'unidades': nuevaEmpresa.unidades,
-                    'areas': nuevaEmpresa.areas,
-                    'sector': nuevaEmpresa.sector,
-                    'created_at': (nuevaEmpresa.createdAt ?? DateTime.now()).toIso8601String(),
-                    'empleados_asociados': nuevaEmpresa.empleadosAsociados,
-                  });
+                  await supabase.from('empresas').insert(nuevaEmpresa.toMap());
                   setState(() => empresas.add(nuevaEmpresa));
                   Navigator.pop(context);
                 } catch (e) {
@@ -225,5 +261,4 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
         ],
       ),
     );
-  }
-}
+  }}

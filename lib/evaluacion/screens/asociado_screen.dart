@@ -4,6 +4,8 @@ import '../models/asociado.dart';
 import '../models/empresa.dart';
 import 'principios_screen.dart';
 import '../widgets/drawer_lensys.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:uuid/uuid.dart';
 
 class AsociadoScreen extends StatefulWidget {
   final Empresa empresa;
@@ -155,6 +157,110 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
           );
   }
 
+  Future<void> _mostrarDialogoAgregarAsociado() async {
+    final nombreController = TextEditingController();
+    final antiguedadController = TextEditingController();
+    String cargoSeleccionado = 'Ejecutivo';
+
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Nuevo Asociado', style: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nombreController,
+                decoration: InputDecoration(
+                  labelText: 'Nombre',
+                  labelStyle: GoogleFonts.roboto(),
+                  border: const OutlineInputBorder(),
+                ),
+                style: GoogleFonts.roboto(),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: antiguedadController,
+                decoration: InputDecoration(
+                  labelText: 'Antigüedad (años)',
+                  labelStyle: GoogleFonts.roboto(),
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.roboto(),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: cargoSeleccionado,
+                items: ['Ejecutivo', 'Gerente', 'Miembro'].map((nivel) {
+                  return DropdownMenuItem<String>(
+                    value: nivel,
+                    child: Text(nivel, style: GoogleFonts.roboto()),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  cargoSeleccionado = value!;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Nivel',
+                  labelStyle: GoogleFonts.roboto(),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar', style: GoogleFonts.roboto()),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final nombre = nombreController.text.trim();
+              final antiguedadTexto = antiguedadController.text.trim();
+              final antiguedad = int.tryParse(antiguedadTexto);
+
+              if (nombre.isEmpty || antiguedad == null) {
+                _mostrarAlerta('Error', 'Completa todos los campos correctamente.');
+                return;
+              }
+
+              final nuevoId = const Uuid().v4();
+              final nuevo = Asociado(
+                id: nuevoId,
+                nombre: nombre,
+                cargo: cargoSeleccionado.toLowerCase(),
+                empresaId: widget.empresa.id,
+                empleadosAsociados: [],
+                progresoDimensiones: {},
+                comportamientosEvaluados: {},
+                antiguedad: antiguedad,
+              );
+
+              try {
+                await _supabaseService.addAsociado(nuevo);
+                if (!mounted) return;
+                Navigator.pop(context); // Cierra el diálogo solo si fue exitoso
+                await _cargarAsociados();
+                _mostrarAlerta('Éxito', 'Asociado agregado exitosamente.');
+              } catch (e) {
+                if (mounted) Navigator.pop(context);
+                _mostrarAlerta('Error', 'Error al guardar asociado: $e');
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF003056),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Asociar empleado', style: GoogleFonts.roboto()),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _tabController?.dispose();
@@ -163,8 +269,12 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       key: _scaffoldKeyAsociado,
+      drawer: SizedBox(width: 300, child: const DrawerLensys()),
       appBar: AppBar(
         backgroundColor: const Color(0xFF003056),
         centerTitle: true,
@@ -175,7 +285,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
         title: Center(
           child: Text(
             ' ${widget.empresa.nombre}',
-            style: const TextStyle(color: Colors.white),
+            style: GoogleFonts.roboto(color: Colors.white),
           ),
         ),
         actions: [
@@ -189,8 +299,8 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
           indicatorColor: Colors.grey.shade300,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey.shade300,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-          unselectedLabelStyle: TextStyle(),
+          labelStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+          unselectedLabelStyle: GoogleFonts.roboto(),
           tabs: const [
             Tab(text: 'EJECUTIVOS'),
             Tab(text: 'GERENTES'),
@@ -212,7 +322,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Aquí deberías mostrar el diálogo para agregar asociado y recargar la lista
+          await _mostrarDialogoAgregarAsociado();
         },
         backgroundColor: const Color(0xFF003056),
         shape: RoundedRectangleBorder(
