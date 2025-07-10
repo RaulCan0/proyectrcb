@@ -2,14 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:lensysapp/evaluacion/screens/dashboard_screen.dart';
-import 'package:lensysapp/evaluacion/screens/detalles_evaluacion.dart';
 import 'package:lensysapp/evaluacion/screens/empresas_screen.dart';
-import 'package:lensysapp/evaluacion/screens/historial_screen.dart';
 import 'package:lensysapp/evaluacion/screens/tablas_screen.dart';
 import 'package:lensysapp/perfil.dart';
 import 'package:lensysapp/auth/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../screens/detalles_evaluacion.dart';
+import '../screens/historial_screen.dart';
 
 class DrawerLensys extends StatelessWidget {
   const DrawerLensys({super.key});

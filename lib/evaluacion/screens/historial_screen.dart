@@ -4,7 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/empresa.dart';
 
 class HistorialScreen extends StatefulWidget {
-  const HistorialScreen({super.key, required List<Empresa> empresas, required List empresasHistorial});
+  final List<Empresa> empresas;
+  final List empresasHistorial;
+  const HistorialScreen({super.key, required this.empresas, required this.empresasHistorial});
 
   @override
   State<HistorialScreen> createState() => _HistorialScreenState();
@@ -12,12 +14,13 @@ class HistorialScreen extends StatefulWidget {
 
 class _HistorialScreenState extends State<HistorialScreen> {
   final _supabase = Supabase.instance.client;
-  List<Empresa> empresas = [];
+  late List<Empresa> empresas;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    empresas = widget.empresas;
     _cargarEmpresas();
   }
 

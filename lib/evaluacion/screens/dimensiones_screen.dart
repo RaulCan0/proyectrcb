@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/evaluacion/models/empresa.dart';
 import 'package:lensysapp/evaluacion/screens/asociado_screen.dart';
 import 'package:lensysapp/evaluacion/screens/shingo_result.dart';
 import 'package:lensysapp/evaluacion/screens/tabla_score_global.dart';
-import 'package:lensysapp/evaluacion/services/progresos_service.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
+
+import '../services/progresos_service.dart';
 
 class DimensionesScreen extends StatelessWidget {
   final Empresa empresa;
@@ -19,20 +21,20 @@ class DimensionesScreen extends StatelessWidget {
         'id': '1',
         'nombre': 'IMPULSORES CULTURALES',
         'icono': Icons.group,
-        'color': Colors.indigo,
-      },
+        'color': AppColors.d1,},
       {
         'id': '2',
         'nombre': 'MEJORA CONTINUA',
         'icono': Icons.update,
-        'color': Colors.green,
+        'color': AppColors.d2
       },
       {
         'id': '3',
         'nombre': 'ALINEAMIENTO EMPRESARIAL',
         'icono': Icons.business,
-        'color': Colors.red,
+        'color': AppColors.d3,
       },
+      
       {
         'id': '4',
         'nombre': 'RESULTADOS',

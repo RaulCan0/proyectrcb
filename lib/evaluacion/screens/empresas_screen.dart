@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
-import 'package:lensysapp/evaluacion/models/empresa.dart';
 import 'package:lensysapp/evaluacion/screens/dimensiones_screen.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
+import 'package:uuid/uuid.dart';
+import 'package:lensysapp/evaluacion/models/empresa.dart';
 
-class EmpresasScreen extends StatelessWidget {
+class EmpresasScreen extends StatefulWidget {
   const EmpresasScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-   
+  State<EmpresasScreen> createState() => _EmpresasScreenState();
+}
 
+class _EmpresasScreenState extends State<EmpresasScreen> {
+  final List<Empresa> empresas = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  Widget build(BuildContext context) {
+    final empresaCreada = empresas.isNotEmpty ? empresas.last : null;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         centerTitle: true,
@@ -26,7 +35,7 @@ class EmpresasScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+            onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
           ),
         ],
       ),
@@ -46,12 +55,29 @@ class EmpresasScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
+                ElevatedButton(
                 onPressed: () {
-                  // Aquí puedes navegar a historial si lo deseas
+                  Navigator.pushNamed(context, '/historial');
                 },
                 child: const Text('HISTORIAL'),
-              ),
+                ),
+              const SizedBox(height: 20),
+              if (empresaCreada != null)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DimensionesScreen(
+                          empresaId: empresaCreada.id,
+                          evaluacionId: const Uuid().v4(),
+                          empresa: empresaCreada,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Evaluar ${empresaCreada.nombre}'),
+                ),
             ],
           ),
         ),
@@ -144,35 +170,21 @@ class EmpresasScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              final empresa = {
-                'nombre': nombreController.text,
-                'tamano': tamano,
-                'empleadosTotal': int.tryParse(empleadosController.text) ?? 0,
-                'unidades': unidadesController.text,
-                'areas': int.tryParse(areasController.text) ?? 0,
-                'sector': sectorController.text,
-                'createdAt': DateTime.now().toIso8601String(),
-              };
-              debugPrint('Empresa creada: $empresa');
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DimensionesScreen(
-                    empresaId: '',
-                    evaluacionId: '',
-                    empresa: Empresa(
-                      nombre: nombreController.text,
-                      tamano: tamano,
-                      empleadosTotal: int.tryParse(empleadosController.text) ?? 0,
-                      unidades: unidadesController.text,
-                      areas: int.tryParse(areasController.text) ?? 0,
-                      sector: sectorController.text,
-                      createdAt: DateTime.now(), id: '', empleadosAsociados: [],
-                    ),
-                  ),
-                ),
-              );
+              final nombre = nombreController.text.trim();
+              if (nombre.isNotEmpty) {
+                final nuevaEmpresa = Empresa(
+                  id: const Uuid().v4(),
+                  nombre: nombre,
+                  tamano: tamano,
+                  empleadosTotal: int.tryParse(empleadosController.text.trim()) ?? 0,
+                  unidades: unidadesController.text.trim(),
+                  areas: int.tryParse(areasController.text.trim()) ?? 0,
+                  sector: sectorController.text.trim(),
+                  createdAt: DateTime.now(), empleadosAsociados: [],
+                );
+                setState(() => empresas.add(nuevaEmpresa));
+                Navigator.pop(context);
+              }
             },
             child: const Text('Guardar'),
           ),

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:lensysapp/evaluacion/models/asociado.dart';
 import 'package:lensysapp/evaluacion/models/calificacion.dart';
 import 'package:lensysapp/evaluacion/models/empresa.dart';
-import 'package:lensysapp/evaluacion/models/evaluacion.dart';
-import 'package:lensysapp/evaluacion/models/level_averages.dart';
+import '../models/evaluacion.dart';
+import '../models/level_averages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 

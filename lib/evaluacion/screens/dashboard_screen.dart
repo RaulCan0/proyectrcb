@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
-import 'package:lensysapp/evaluacion/widgets/multiring.dart';
-import 'package:lensysapp/evaluacion/widgets/scatter_bubble_chart.dart';
-import 'package:lensysapp/evaluacion/widgets/grouped_bar_chart.dart';
-import 'package:lensysapp/evaluacion/widgets/horizontal_bar_systems_chart.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
+import '../widgets/grouped_bar_chart.dart';
+import '../widgets/horizontal_bar_systems_chart.dart';
+import '../widgets/multiring.dart';
+import '../widgets/scatter_bubble_chart.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

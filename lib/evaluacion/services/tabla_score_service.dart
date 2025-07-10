@@ -1,8 +1,9 @@
-import 'package:lensysapp/evaluacion/models/detalle_evaluacion.dart';
-import 'package:lensysapp/evaluacion/models/score_level.dart';
 
+
+import '../models/detalle_evaluacion.dart';
 import '../models/empresa.dart';
 import '../models/evaluacion.dart';
+import '../models/score_level.dart';
 import 'shingo_result_service.dart';
 
 class ScoreGlobalService {
