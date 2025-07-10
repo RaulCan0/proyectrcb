@@ -92,9 +92,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
       await Supabase.instance.client.from('usuarios').upsert({
         'id': user.id,
         'nombre': _nombreController.text.trim(),
-     
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+           });
 
       _mostrarSnackBar('Perfil actualizado correctamente');
     } catch (e) {

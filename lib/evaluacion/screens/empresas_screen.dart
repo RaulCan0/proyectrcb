@@ -1,9 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/evaluacion/screens/dimensiones_screen.dart';
+import 'package:lensysapp/evaluacion/screens/historial_screen.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 import 'package:uuid/uuid.dart';
 import 'package:lensysapp/evaluacion/models/empresa.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmpresasScreen extends StatefulWidget {
   const EmpresasScreen({super.key});
@@ -54,10 +58,18 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/historial');
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => HistorialScreen(
+                    empresas: empresas,
+                    empresasHistorial: const [],
+                    ),
+                  ),
+                  );
                 },
                 child: const Text('HISTORIAL'),
                 ),
@@ -169,7 +181,7 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final nombre = nombreController.text.trim();
               if (nombre.isNotEmpty) {
                 final nuevaEmpresa = Empresa(
@@ -180,10 +192,32 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
                   unidades: unidadesController.text.trim(),
                   areas: int.tryParse(areasController.text.trim()) ?? 0,
                   sector: sectorController.text.trim(),
-                  createdAt: DateTime.now(), empleadosAsociados: [],
+                  createdAt: DateTime.now(),
+                  empleadosAsociados: [],
                 );
-                setState(() => empresas.add(nuevaEmpresa));
-                Navigator.pop(context);
+                // Guardar en Supabase
+                try {
+                  final supabase = Supabase.instance.client;
+                  await supabase.from('empresas').insert({
+                    'id': nuevaEmpresa.id,
+                    'nombre': nuevaEmpresa.nombre,
+                    'tamano': nuevaEmpresa.tamano,
+                    'empleados_total': nuevaEmpresa.empleadosTotal,
+                    'unidades': nuevaEmpresa.unidades,
+                    'areas': nuevaEmpresa.areas,
+                    'sector': nuevaEmpresa.sector,
+                    'created_at': (nuevaEmpresa.createdAt ?? DateTime.now()).toIso8601String(),
+                    'empleados_asociados': nuevaEmpresa.empleadosAsociados,
+                  });
+                  setState(() => empresas.add(nuevaEmpresa));
+                  Navigator.pop(context);
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error al guardar empresa: $e')),
+                    );
+                  }
+                }
               }
             },
             child: const Text('Guardar'),
