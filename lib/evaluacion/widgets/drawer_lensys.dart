@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:lensysapp/evaluacion/models/empresa.dart';
 import 'package:lensysapp/evaluacion/screens/dashboard_screen.dart';
 import 'package:lensysapp/evaluacion/screens/empresas_screen.dart';
 import 'package:lensysapp/evaluacion/screens/tablas_screen.dart';
@@ -96,7 +97,23 @@ class DrawerLensys extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const TablasDimensionScreen()),
+                  MaterialPageRoute(builder: (_) => TablasDimensionScreen(
+                    empresa: Empresa(
+                      id: 'defaultId',
+                      nombre: 'Default Empresa',
+                      tamano: 'Default Tamano',
+                      empleadosTotal: 0,
+                      empleadosAsociados: [],
+                      unidades: 'Default Unidades',
+                      areas: 0,
+                      sector: 'Default Sector',
+                      createdAt: DateTime.now(),
+                    ),
+                    evaluacionId: '',
+                    asociadoId: '',
+                    empresaId: '',
+                    dimension: '',
+                  )),
                 );
               },
             ),
@@ -106,7 +123,11 @@ class DrawerLensys extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DetallesEvaluacionScreen()),
+                  MaterialPageRoute(builder: (_) => DetallesEvaluacionScreen(
+                    dimensionesPromedios: {},
+                    empresaId: '',
+                    evaluacionId: '',
+                  )),
                 );
               },
             ),
@@ -136,7 +157,10 @@ class DrawerLensys extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  MaterialPageRoute(builder: (_) => DashboardScreen(
+                    empresaId: '',
+                    evaluacionId: '',
+                  )),
                 );
               },
             ),

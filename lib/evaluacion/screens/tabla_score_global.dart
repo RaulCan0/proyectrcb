@@ -8,7 +8,7 @@ class TablaScoreGlobal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textSizeProvider = Provider.of<TextSizeProvider>(context);
+    final textSizeProvider = Provider.of<TextSizeProvider>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -21,9 +21,11 @@ class TablaScoreGlobal extends StatelessWidget {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
         ],
       ),

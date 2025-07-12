@@ -36,7 +36,7 @@ body: CustomPaint(
             children: [
               const SizedBox(height: 34),
               const Text(
-                'LEAN TRAINING CENTER',
+                'LENSYS TRAINING CENTER',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -45,7 +45,7 @@ body: CustomPaint(
               ),
               const SizedBox(height: 5),
               const Text(
-                'Bienvenido a la \naplicación oficial',
+                'Bienvenido  \naplicación oficial',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white70,
@@ -55,8 +55,11 @@ body: CustomPaint(
               Center(
                 child: SizedBox(
                   height: 140,
-                  child: Image.asset('assets/logo.webp'),
-                ),
+                  child: Image.asset(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'assets/logoblanco.webp'
+                        : 'assets/logo.webp',
+                  ),  ),
               ),
               const Spacer(),
               Column(

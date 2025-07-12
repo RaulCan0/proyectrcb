@@ -4,11 +4,45 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lensysapp/custom/appcolors.dart';
+import 'package:lensysapp/evaluacion/widgets/sistema_selector.dart';
 import 'package:uuid/uuid.dart';
 import 'package:lensysapp/evaluacion/models/calificacion.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
 import '../widgets/tabla_rol_button.dart';
 import '../widgets/drawer_lensys.dart';
+
+// Mapa de sistemas recomendados por comportamiento
+const Map<String, String> sistemasRecomendadosPorComportamiento = {
+  "Soporte": "Desarrollo de personas, Medición, Reconocimiento",
+  "Reconocer": "Medición, Involucramiento, Reconocimiento, Desarrollo de Personas",
+  "Comunidad": "Seguridad, Ambiental, EHS, Compromiso, Desarrollo de Personas",
+  "Liderazgo de servidor": "Desarrollo de Personas",
+  "Valorar": "Desarrollo de Personas, Involucramiento",
+  "Empoderar": "Medición, Reconocimiento, Desarrollo de Personas",
+  "Mentalidad": "Sistemas de Mejora",
+  "Estructura": "Sistemas de Mejora",
+  "Reflexionar": "Solución de Problemas",
+  "Análisis": "Solución de Problemas",
+  "Colaborar": "Solución de Problemas",
+  "Comprender": "Solución de Problemas, Gestión Visual",
+  "Diseño": "Sistemas de Mejora, Gestión Visual",
+  "Atribución": "Sistemas de Mejora, Solución de Problemas",
+  "A prueba de error": "Sistemas de Mejora, Solución de Problemas",
+  "Propiedad": "Sistemas de Mejora, Solución de Problemas",
+  "Conectar": "Sistemas de Mejora",
+  "Ininterrumpido": "Planificación y Programación, Sistemas de Mejora",
+  "Demanda": "Planificación y Programación",
+  "Eliminar": "Voz de cliente, Sistemas de Mejora",
+  "Optimizar": "Sistemas de Mejora, Despliegue de Estrategia",
+  "Impacto": "Sistemas de Mejora",
+  "Alinear": "Despliegue de Estrategia",
+  "Aclarar": "Comunicación, Despliegue de Estrategia",
+  "Comunicar": "Comunicación, Despliegue de Estrategia",
+  "Relación": "Voz del Cliente",
+  "Valor": "Voz del Cliente",
+  "Medida": "Despliegue de Estrategia, Medición, Voz del Cliente, Recompensas, Reconocimientos",
+};
+
 
 class ComportamientoEvaluacionScreen extends StatefulWidget {
   final String principio;
@@ -173,12 +207,17 @@ class _ComportamientoEvaluacionScreenState extends State<ComportamientoEvaluacio
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.settings),
                   label: const Text('Sistemas asociados'),
-                  onPressed: isSaving
+       onPressed: isSaving
                       ? null
                       : () async {
-                          // Aquí deberías mostrar un selector de sistemas
-                          // Por ahora simulo selección
-                          await _saveSelectedSystems(['Sistema 1', 'Sistema 2']);
+                          final seleccion = await showModalBottomSheet<List<String>>(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => SistemasScreen(
+                              onSeleccionar: (s) => Navigator.pop(context, s.map((e) => e['nombre'].toString()).toList()),
+                            ),
+                          );
+                          if (seleccion != null) await _saveSelectedSystems(seleccion);
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

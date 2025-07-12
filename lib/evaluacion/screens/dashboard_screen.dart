@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
+import 'package:lensysapp/services-home/theme_provider.dart';
+import 'package:provider/provider.dart';
 import '../widgets/grouped_bar_chart.dart';
 import '../widgets/horizontal_bar_systems_chart.dart';
 import '../widgets/multiring.dart';
 import '../widgets/scatter_bubble_chart.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key,  required String evaluacionId, required String empresaId, });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -83,9 +85,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: true);
     return Scaffold(
+      backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: themeProvider.isDarkMode ? Colors.black : AppColors.primary,
         elevation: 0,
         centerTitle: true,
         title: const Text(
@@ -102,10 +106,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: _loadData,
             tooltip: 'Refrescar datos',
           ),
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
-            tooltip: 'Menú',
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
         ],
       ),

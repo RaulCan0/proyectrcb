@@ -45,11 +45,11 @@ class TablaRolButton extends StatelessWidget {
       dataRowMinHeight: 50,
       columns: const [
         DataColumn(label: Text('Lentes / Rol')),
-        DataColumn(label: Text('Nivel 1\n0–20%')),
-        DataColumn(label: Text('Nivel 2\n21–40%')),
-        DataColumn(label: Text('Nivel 3\n41–60%')),
-        DataColumn(label: Text('Nivel 4\n61–80%')),
-        DataColumn(label: Text('Nivel 5\n81–100%')),
+        DataColumn(label: Text('Cargo 1\n0–20%')),
+        DataColumn(label: Text('Cargo 2\n21–40%')),
+        DataColumn(label: Text('Cargo 3\n41–60%')),
+        DataColumn(label: Text('Cargo 4\n61–80%')),
+        DataColumn(label: Text('Cargo 5\n81–100%')),
       ],
       rows: const [
         DataRow(cells: [

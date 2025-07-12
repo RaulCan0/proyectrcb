@@ -62,11 +62,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<Map<String, dynamic>> _getUserData() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return {};
+    try {
+      final data = await Supabase.instance.client
+          .from('usuarios')
+          .select('foto_url')
+          .eq('id', user.id)
+          .single();
+      return {'foto_url': data['foto_url'] ?? ''};
+    } catch (_) {
+      return {'foto_url': user.userMetadata?['avatar_url'] ?? ''};
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
     final themeProvider = Provider.of<ThemeProvider>(context, listen: true);
-    final textSizeProvider = Provider.of<TextSizeProvider>(context, listen: true);
+    final user = Supabase.instance.client.auth.currentUser;
+    context.watch<ThemeProvider>();
 
     return Scaffold(
       backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
@@ -86,12 +101,23 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundImage: NetworkImage(
-                      user?.userMetadata?['avatar_url'] ??
-                          'https://ui-avatars.com/api/?name=${user?.email ?? 'U'}',
-                    ),
+                  FutureBuilder<Map<String, dynamic>>(
+                    future: _getUserData(),
+                    builder: (context, snapshot) {
+                      final fotoUrl = snapshot.data?['foto_url'] ?? user?.userMetadata?['avatar_url'] ?? '';
+                      if (fotoUrl.isNotEmpty) {
+                        return CircleAvatar(
+                          radius: 35,
+                          backgroundImage: NetworkImage(fotoUrl),
+                        );
+                      } else {
+                        return const CircleAvatar(
+                          radius: 35,
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.person, size: 40, color: Color(0xFF003056)),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(width: 20),
                   Column(
@@ -101,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         user?.email ?? 'Sin email',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: textSizeProvider.fontSize + 3,
+                          fontSize: 18, // Replace with a fixed value or use another provider if available
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Roboto',
                         ),
@@ -109,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 4),
                       const Text(
                         'Bienvenido',
-                        style: TextStyle(color: Colors.white70, fontSize: 15, fontFamily: 'Roboto'),
+                        style: TextStyle(color: Colors.white70, fontSize: 15),
                       ),
                     ],
                   )
@@ -220,8 +246,6 @@ class _DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textSizeProvider = Provider.of<TextSizeProvider>(context, listen: true);
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -251,11 +275,10 @@ class _DashboardCard extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               title,
-              style: TextStyle(
-                fontSize: textSizeProvider.fontSize + 5,
+              style: const TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
-                fontFamily: 'Roboto',
               ),
               textAlign: TextAlign.center,
             ),

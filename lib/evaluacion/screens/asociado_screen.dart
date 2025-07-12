@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:lensysapp/chat/chat_screen.dart';
+import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/asociado.dart';
-import '../models/empresa.dart';
+import '../models/empresa.dart'; // Importar el modelo Empresa
 import 'principios_screen.dart';
 import '../widgets/drawer_lensys.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 
 class AsociadoScreen extends StatefulWidget {
-  final Empresa empresa;
+  final String empresaId;
   final String dimensionId;
   final String evaluacionId;
 
   const AsociadoScreen({
     super.key,
-    required this.empresa,
+    required this.empresaId,
     required this.dimensionId,
     required this.evaluacionId,
   });
@@ -23,7 +26,9 @@ class AsociadoScreen extends StatefulWidget {
   State<AsociadoScreen> createState() => _AsociadoScreenState();
 }
 
+
 class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProviderStateMixin {
+  final supabase = Supabase.instance.client;
   final SupabaseService _supabaseService = SupabaseService();
   final Map<String, double> progresoAsociado = {};
   final GlobalKey<ScaffoldState> _scaffoldKeyAsociado = GlobalKey<ScaffoldState>();
@@ -43,7 +48,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
 
   Future<void> _cargarAsociados() async {
     try {
-      final asociadosCargados = await _supabaseService.getAsociadosPorEmpresa(widget.empresa.id);
+      final asociadosCargados = await _supabaseService.getAsociadosPorEmpresa(widget.empresaId);
       ejecutivos.clear();
       gerentes.clear();
       miembros.clear();
@@ -79,82 +84,16 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(titulo),
-        content: Text(mensaje),
+        title: Text(titulo, style: GoogleFonts.roboto()),
+        content: Text(mensaje, style: GoogleFonts.roboto()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Aceptar'),
+            child: Text('Aceptar', style: GoogleFonts.roboto()),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildLista(List<Asociado> lista) {
-    return lista.isEmpty
-        ? const Center(child: Text('SIN ASOCIADOS'))
-        : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ListView.builder(
-              itemCount: lista.length,
-              itemBuilder: (context, index) {
-                final asociado = lista[index];
-                final progreso = progresoAsociado[asociado.id] ?? 0.0;
-                return Card(
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.person_outline,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : const Color(0xFF003056),
-                    ),
-                    title: Text(asociado.nombre),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${asociado.cargo.trim().toLowerCase() == "miembro" ? "MIEMBRO DE EQUIPO" : asociado.cargo.toUpperCase()} - ${asociado.antiguedad} años',
-                          style: const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Progreso:', style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text(
-                              '${(progreso * 100).toStringAsFixed(1)}% completado',
-                              style: const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: progreso,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.green,
-                        ),
-                        Text('${(progreso * 100).toStringAsFixed(1)}% completado'),
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PrincipiosScreen(
-                            empresa: widget.empresa,
-                            asociado: asociado,
-                            dimensionId: widget.dimensionId,
-                            evaluacionId: widget.evaluacionId, empresaId: '',
-                          ),
-                        ),
-                      ).then((_) => _cargarAsociados());
-                    },
-                  ),
-                );
-              },
-            ),
-          );
   }
 
   Future<void> _mostrarDialogoAgregarAsociado() async {
@@ -162,7 +101,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
     final antiguedadController = TextEditingController();
     String cargoSeleccionado = 'Ejecutivo';
 
-    await showDialog(
+    showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text('Nuevo Asociado', style: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
@@ -232,7 +171,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
                 id: nuevoId,
                 nombre: nombre,
                 cargo: cargoSeleccionado.toLowerCase(),
-                empresaId: widget.empresa.id,
+                empresaId: widget.empresaId,
                 empleadosAsociados: [],
                 progresoDimensiones: {},
                 comportamientosEvaluados: {},
@@ -240,10 +179,35 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
               );
 
               try {
-                await _supabaseService.addAsociado(nuevo);
+                await supabase.from('asociados').insert({
+                  'id': nuevoId,
+                  'nombre': nombre,
+                  'cargo': cargoSeleccionado.toLowerCase(),
+                  'empresa_id': widget.empresaId,
+                  'dimension_id': widget.dimensionId,
+                  'antiguedad': antiguedad,
+                });
+
                 if (!mounted) return;
-                Navigator.pop(context); // Cierra el diálogo solo si fue exitoso
-                await _cargarAsociados();
+                setState(() {
+                  switch (cargoSeleccionado.toLowerCase()) {
+                    case 'ejecutivo':
+                      ejecutivos.add(nuevo);
+                      _tabController?.index = 0;
+                      break;
+                    case 'gerente':
+                      gerentes.add(nuevo);
+                      _tabController?.index = 1;
+                      break;
+                    case 'miembro':
+                      miembros.add(nuevo);
+                      _tabController?.index = 2;
+                      break;
+                  }
+                  progresoAsociado[nuevoId] = 0.0;
+                });
+
+                if (mounted) Navigator.pop(context);
                 _mostrarAlerta('Éxito', 'Asociado agregado exitosamente.');
               } catch (e) {
                 if (mounted) Navigator.pop(context);
@@ -261,6 +225,95 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
     );
   }
 
+  Widget _buildLista(List<Asociado> lista) {
+    return lista.isEmpty
+        ? const Center(child: Text('SIN ASOCIADOS'))
+        : Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ListView.builder(
+              itemCount: lista.length,
+              itemBuilder: (context, index) {
+                final asociado = lista[index];
+                final progreso = progresoAsociado[asociado.id] ?? 0.0;
+                return Card(
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.person_outline,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : const Color(0xFF003056),
+                    ),
+                    title: Text(asociado.nombre, style: GoogleFonts.roboto()),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${asociado.cargo.trim().toLowerCase() == "miembro" ? "MIEMBRO DE EQUIPO" : asociado.cargo.toUpperCase()} - ${asociado.antiguedad} años',
+                          style: GoogleFonts.roboto(fontSize: 14, color: Colors.grey),
+                        ),
+                       const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Progreso:',
+                              style: GoogleFonts.roboto(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.blueGrey[800],
+                              ),
+                            ),
+                            Text(
+                              '${(progreso * 100).toStringAsFixed(1)}% completado',
+                              style: GoogleFonts.roboto(
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.blueGrey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 4),
+                        LinearProgressIndicator(
+                          value: progreso,
+                          backgroundColor: Colors.grey[300],
+                          color: Colors.green,
+                        ),
+                        Text('${(progreso * 100).toStringAsFixed(1)}% completado', style: GoogleFonts.roboto()),
+                      
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PrincipiosScreen(
+                            empresa: Empresa(
+                              id: widget.empresaId,
+                              nombre: '',
+                              tamano: '',
+                              empleadosTotal: 0,
+                              empleadosAsociados: [],
+                              unidades: '',
+                              areas: 0,
+                              sector: '',
+                              createdAt: DateTime.now(),
+                            ),
+                            asociado: asociado,
+                            dimensionId: widget.dimensionId,
+                            evaluacionId: widget.evaluacionId,
+                          ),
+                        ),
+                      ).then((_) => _cargarAsociados());
+                    },
+                  ));
+              },
+            ),
+          );
+  }
   @override
   void dispose() {
     _tabController?.dispose();
@@ -269,14 +322,13 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
-    final screenSize = MediaQuery.of(context).size;
-
+     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       key: _scaffoldKeyAsociado,
-      drawer: SizedBox(width: 300, child: const DrawerLensys()),
+      drawer: SizedBox(width: 300, child: const ChatWidgetDrawer()),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF003056),
+        backgroundColor: isDarkMode ? Colors.black : AppColors.primary,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -284,14 +336,16 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
         ),
         title: Center(
           child: Text(
-            ' ${widget.empresa.nombre}',
+            ' ${widget.empresaId}',
             style: GoogleFonts.roboto(color: Colors.white),
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => _scaffoldKeyAsociado.currentState?.openEndDrawer(),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
         ],
         bottom: TabBar(
@@ -309,7 +363,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
         ),
       ),
       endDrawer: const DrawerLensys(),
-      body: Padding(
+      body: Padding( // Añadido Padding superior para el TabBarView
         padding: const EdgeInsets.only(top: 15.0),
         child: TabBarView(
           controller: _tabController,
@@ -323,14 +377,15 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await _mostrarDialogoAgregarAsociado();
+          await _cargarAsociados();
         },
         backgroundColor: const Color(0xFF003056),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100),
         ),
         elevation: 8,
-        child: const Icon(Icons.person_add, size: 25, color: Colors.white),
+        child: const Icon(Icons.add, size: 25, color: Colors.white),
       ),
     );
-  }
-}
+  }}
+  

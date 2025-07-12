@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:lensysapp/custom/appcolors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/empresa.dart';
 
@@ -79,7 +80,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Historial de Empresas'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: AppColors.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -98,10 +99,42 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 itemBuilder: (context, index) {
                   final empresa = empresas[index];
                   return ExpansionTile(
-                    leading: const Icon(Icons.business, color: Colors.indigo),
-                    title: Text(
-                      empresa.nombre,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    leading: const Icon(Icons.business, color: Color.fromARGB(255, 3, 20, 119)),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            empresa.nombre,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        // Minicontador de asociados
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade50,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color.fromARGB(255, 161, 163, 173)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.group, size: 18, color: Colors.indigo),
+                              const SizedBox(width: 4),
+                              Text(
+                                empresa.empleadosAsociados.length.toString(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 146, 146, 146),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     children: [
                       Padding(

@@ -7,13 +7,35 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lensysapp/services-home/text_size_provider.dart';
+import 'package:lensysapp/services-home/theme_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:lensysapp/evaluacion/providers/score_global_provider.dart';
+import 'package:lensysapp/evaluacion/providers/empresas.dart';
+import 'package:lensysapp/evaluacion/providers/asociados.dart';
+import 'package:lensysapp/evaluacion/providers/calificaciones.dart';
+import 'package:lensysapp/evaluacion/providers/evaluacion_provider.dart';
+import 'package:lensysapp/evaluacion/providers/resultados.dart';
 
 import 'package:lensysapp/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const LensysApp());
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => TextSizeProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => EmpresasProvider()),
+          ChangeNotifierProvider(create: (_) => AsociadosProvider()),
+          ChangeNotifierProvider(create: (_) => ScoreGlobalProvider()),
+          ChangeNotifierProvider(create: (_) => CalificacionesProvider()),
+          ChangeNotifierProvider(create: (_) => EvaluacionesProvider()),
+          ChangeNotifierProvider(create: (_) => ResultadosDashboardProvider()),
+        ],
+        child: const LensysApp(),
+      ),
+    );
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
