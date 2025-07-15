@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'package:lensysapp/auth/login.dart';
 import 'package:lensysapp/auth/register.dart';
-import 'package:lensysapp/custom/appcolors.dart';
 
 class LoaderScreen extends StatefulWidget {
   const LoaderScreen({super.key});
@@ -105,12 +104,14 @@ body: CustomPaint(
 }
 
 class DiagonalPainter extends CustomPainter {
-  const DiagonalPainter({required Color color});
+  final Color color;
+
+  const DiagonalPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.primary // usa el color principal definido en AppColors
+      ..color = color
       ..style = PaintingStyle.fill;
 
     final path = Path()
