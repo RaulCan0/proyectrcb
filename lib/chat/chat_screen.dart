@@ -1,7 +1,7 @@
 
 
 import 'chat_service.dart';
-import '../models-home/message.dart';
+import 'message.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

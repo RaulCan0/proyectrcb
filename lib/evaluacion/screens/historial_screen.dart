@@ -1,75 +1,76 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:lensysapp/custom/appcolors.dart';
+import 'package:lensysapp/evaluacion/models/empresa.dart';
+import 'package:lensysapp/evaluacion/services/error_handler_service.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/empresa.dart';
 
 class HistorialScreen extends StatefulWidget {
   final List<Empresa> empresas;
-  final List empresasHistorial;
-  const HistorialScreen({super.key, required this.empresas, required this.empresasHistorial});
+
+  const HistorialScreen({super.key, required this.empresas});
 
   @override
-  State<HistorialScreen> createState() => _HistorialScreenState();
+  // ignore: library_private_types_in_public_api
+  _HistorialScreenState createState() => _HistorialScreenState();
 }
 
 class _HistorialScreenState extends State<HistorialScreen> {
   final _supabase = Supabase.instance.client;
-  late List<Empresa> empresas;
+  List<Empresa> empresas = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     empresas = widget.empresas;
-    _cargarEmpresas();
+    _fetchEmpresas();
   }
 
-  Future<void> _cargarEmpresas() async {
+  Future<void> _fetchEmpresas() async {
     try {
       final response = await _supabase.from('empresas').select();
 
-      final List<Empresa> empresasCargadas =
-          (response as List).map((item) {
-            List<String> empleadosAsociados = [];
-            if (item['empleados_asociados'] is List) {
-              empleadosAsociados = List<String>.from(
-                item['empleados_asociados'],
-              );
-            } else if (item['empleados_asociados'] is String &&
-                item['empleados_asociados'].isNotEmpty) {
-              try {
-                empleadosAsociados = List<String>.from(
-                  jsonDecode(item['empleados_asociados']),
-                );
-              } catch (_) {
-                empleadosAsociados = [];
-              }
-            }
-            return Empresa(
-              id: item['id'] ?? '',
-              nombre: item['nombre'] ?? '',
-              tamano: item['tamano'] ?? '',
-              empleadosTotal: item['empleados_total'] ?? 0,
-              empleadosAsociados: empleadosAsociados,
-              unidades: item['unidades'] ?? '',
-              areas: item['areas'] ?? 0,
-              sector: item['sector'] ?? '',
-              createdAt: item['created_at'] != null
-                  ? DateTime.parse(item['created_at'])
-                  : DateTime.fromMillisecondsSinceEpoch(0),
-            );
-          }).toList();
+      final empresasCargadas = response.map<Empresa>((item) {
+        List<String> empleadosAsociados = [];
 
-      setState(() {
-        empresas = empresasCargadas;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() => isLoading = false);
+        try {
+          if (item['empleados_asociados'] is List) {
+            empleadosAsociados = List<String>.from(item['empleados_asociados']);
+          } else if (item['empleados_asociados'] is String && item['empleados_asociados'].isNotEmpty) {
+            empleadosAsociados = List<String>.from(jsonDecode(item['empleados_asociados']));
+          }
+        } catch (e) {
+          debugPrint('Error al decodificar empleados_asociados: $e');
+        }
+
+        return Empresa(
+          id: item['id'] ?? 'Sin ID',
+          evaluacionid: item['id_evaluacion'] ?? '',
+          nombre: item['nombre'] ?? 'Empresa sin nombre',
+          tamano: item['tamano'] ?? '-',
+          empleadosTotal: item['empleados_total'] ?? 0,
+          empleadosAsociados: empleadosAsociados,
+          unidades: item['unidades'] ?? '-',
+          areas: item['areas'] ?? 0,
+          sector: item['sector'] ?? '-',
+          createdAt: item['created_at'] != null
+              ? DateTime.parse(item['created_at'])
+              : DateTime.fromMillisecondsSinceEpoch(0),
+        );
+      }).toList();
+
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al cargar empresas: $e')));
+        setState(() {
+          empresas = empresasCargadas;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        ErrorHandlerService.showSnackBar(context, 'Error al cargar empresas: $e');
       }
     }
   }
@@ -79,78 +80,82 @@ class _HistorialScreenState extends State<HistorialScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Historial de Empresas'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: AppColors.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _cargarEmpresas,
+            onPressed: _fetchEmpresas,
           ),
         ],
       ),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : empresas.isEmpty
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : empresas.isEmpty
               ? const Center(child: Text('No hay empresas registradas.'))
               : ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: empresas.length,
-                itemBuilder: (context, index) {
-                  final empresa = empresas[index];
-                  return ExpansionTile(
-                    leading: const Icon(Icons.business, color: Colors.indigo),
-                    title: Text(
-                      empresa.nombre,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _infoRow('Tamaño', empresa.tamano),
-                            _infoRow('Sector', empresa.sector),
-                            _infoRow('Unidades', empresa.unidades),
-                            _infoRow('Áreas', empresa.areas.toString()),
-                            _infoRow(
-                              'Empleados',
-                              empresa.empleadosTotal.toString(),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Empleados asociados:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            empresa.empleadosAsociados.isEmpty
-                                ? const Text('No hay empleados asociados')
-                                : Column(
-                                  children:
-                                      empresa.empleadosAsociados
-                                          .map(
-                                            (empleado) => Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 8.0,
-                                                top: 4.0,
-                                              ),
-                                              child: Text('• $empleado'),
-                                            ),
-                                          )
-                                          .toList(),
-                                ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                  padding: const EdgeInsets.all(12),
+                  itemCount: empresas.length,
+                  itemBuilder: (context, index) {
+                    final empresa = empresas[index];
+                    return _buildEmpresaTile(empresa);
+                  },
+                ),
     );
   }
 
-  Widget _infoRow(String label, String value) {
+  Widget _buildEmpresaTile(Empresa empresa) {
+    return ExpansionTile(
+      leading: const Icon(Icons.business, color: Color.fromARGB(255, 3, 20, 119)),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(empresa.nombre, style: Theme.of(context).textTheme.titleMedium),
+          Text('Empleados: ${empresa.empleadosTotal}', style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InfoRow(label: 'Tamaño', value: empresa.tamano),
+              InfoRow(label: 'Sector', value: empresa.sector),
+              InfoRow(label: 'Unidades', value: empresa.unidades),
+              InfoRow(label: 'Áreas', value: empresa.areas.toString()),
+              InfoRow(label: 'Empleados', value: empresa.empleadosTotal.toString()),
+              const SizedBox(height: 8),
+              const Text('Empleados asociados:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              empresa.empleadosAsociados.isEmpty
+                  ? const Text('No hay empleados asociados')
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: empresa.empleadosAsociados
+                          .map((e) => Padding(
+                                padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                                child: Text('• $e'),
+                              ))
+                          .toList(),
+                    ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+class InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const InfoRow({super.key, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(

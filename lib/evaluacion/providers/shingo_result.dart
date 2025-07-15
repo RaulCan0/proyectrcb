@@ -11,3 +11,4 @@ class ShingoResultModel {
     required this.calificacion,
   });
 }
+// Este archivo ya no es un Provider, solo modelo/servicio.

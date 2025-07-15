@@ -1,5 +1,4 @@
-
-import 'principio.dart';
+import 'package:lensysapp/evaluacion/models/principio.dart';
 
 class Dimension {
   final String id;

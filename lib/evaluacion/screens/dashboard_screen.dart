@@ -2,90 +2,49 @@
 
 import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
-import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
-import 'package:lensysapp/evaluacion/services/supabase_service.dart';
+import 'package:lensysapp/evaluacion/providers/score_dashboard_provider.dart';
+import 'package:lensysapp/evaluacion/widgets/endrawer_lensys.dart';
+import 'package:lensysapp/perfil/theme_provider.dart';
+import 'package:provider/provider.dart';
 import '../widgets/grouped_bar_chart.dart';
 import '../widgets/horizontal_bar_systems_chart.dart';
 import '../widgets/multiring.dart';
 import '../widgets/scatter_bubble_chart.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key,  required String evaluacionId, required String empresaId, });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final SupabaseService _supabaseService = SupabaseService();
-  bool _loading = true;
-  Map<String, double> ringData = {};
-  Map<String, Color> ringColors = {
+  final Map<String, Color> ringColors = {
     'Impulsores': Colors.blue,
     'Mejora': Colors.green,
     'Alineamiento': Colors.orange,
   };
-  List<ScatterData> scatterData = [];
-  Map<String, List<double>> groupedData = {};
-  Map<String, Map<String, double>> systemsData = {};
-  List<String> sistemasOrdenados = [];
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ScoreDashboardProvider>(context, listen: false);
+      // Ajusta empresaId según tu lógica de sesión
+      final empresaId = '';
+      provider.cargarDashboard(context, empresaId);
+    });
   }
 
-  Future<void> _loadData() async {
-    setState(() => _loading = true);
-    // Ejemplo: obtener empresaId actual (ajusta según tu lógica de sesión)
-    final empresaId = _supabaseService.userId ?? '';
-    // RING: promedios por dimensión
-    final dimAverages = await _supabaseService.getDimensionAverages(empresaId);
-    ringData = {
-      for (var d in dimAverages)
-        (d.nombre.isNotEmpty ? d.nombre : 'Dimensión'): d.general,
-    };
-    // SCATTER: ejemplo con principles
-    final principles = await _supabaseService.getPrinciplesAverages(empresaId);
-    scatterData = [
-      for (var p in principles)
-        ScatterData(
-          x: p.general,
-          y: (p.id).toDouble(),
-          color: Colors.blue,
-          seriesName: 'Principio',
-          principleName: (p.nombre.isNotEmpty ? p.nombre : ''),
-          radius: 12,
-        ),
-    ];
-    // GROUPED: ejemplo con comportamientos
-    final behaviors = await _supabaseService.getBehaviorAverages(empresaId);
-    groupedData = {};
-    for (var b in behaviors) {
-      groupedData[(b.nombre.isNotEmpty ? b.nombre : '')] = [b.ejecutivo, b.gerente, b.miembro];
-    }
-    // SYSTEMS: ejemplo con sistemas
-    final systems = await _supabaseService.getSystemAverages(empresaId);
-    systemsData = {};
-    sistemasOrdenados = [];
-    for (var s in systems) {
-      final nombreSistema = (s.nombre.isNotEmpty ? s.nombre : '');
-      systemsData[nombreSistema] = {
-        'E': s.ejecutivo,
-        'G': s.gerente,
-        'M': s.miembro,
-      };
-      sistemasOrdenados.add(nombreSistema);
-    }
-    setState(() => _loading = false);
-  }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+    final dashboard = context.watch<ScoreDashboardProvider>();
     return Scaffold(
+      backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: themeProvider.isDarkMode ? Colors.black : AppColors.primary,
         elevation: 0,
         centerTitle: true,
         title: const Text(
@@ -99,18 +58,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
+            onPressed: () {
+              // Ajusta empresaId según tu lógica de sesión
+              final empresaId = '';
+              dashboard.cargarDashboard(context, empresaId);
+            },
             tooltip: 'Refrescar datos',
           ),
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
-            tooltip: 'Menú',
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
         ],
       ),
-      endDrawer: const DrawerLensys(),
-      body: _loading
+      endDrawer: const EndrawerLensys(),
+      body: dashboard.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -121,9 +85,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text('Resumen por Dimensión', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 12),
                   MultiRingChart(
-                    dataPoints: ringData,
+                    dataPoints: dashboard.dimensionTotals,
                     dataColors: ringColors,
-                    totalPoints: 5.0, // Ajusta según tu escala
+                    totalPoints: 5.0,
                   ),
                   const SizedBox(height: 32),
                   // SCATTER
@@ -131,7 +95,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 300,
-                    child: ScatterBubbleChart(data: scatterData),
+                    child: ScatterBubbleChart(
+                      // Debes adaptar principleAverages a la estructura de ScatterData si es necesario
+                      data: [],
+                    ),
                   ),
                   const SizedBox(height: 32),
                   // GROUPED
@@ -140,7 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   SizedBox(
                     height: 300,
                     child: GroupedBarChart(
-                      data: groupedData,
+                      data: dashboard.behaviorAveragesByCargo.map((k, v) => MapEntry(k, [v[1] ?? 0, v[2] ?? 0, v[3] ?? 0])),
                       minY: 0,
                       maxY: 5,
                     ),
@@ -152,10 +119,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   SizedBox(
                     height: 400,
                     child: HorizontalBarSystemsChart(
-                      data: systemsData,
+                      data: {}, // Adapta si tienes systemsData en el provider
                       minY: 0,
                       maxY: 5,
-                      sistemasOrdenados: sistemasOrdenados,
+                      sistemasOrdenados: const [],
                     ),
                   ),
                 ],

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class SistemaAsociado {
   final String id;
   final String nombre;
@@ -7,19 +9,28 @@ class SistemaAsociado {
     required this.nombre,
   });
 
-  factory SistemaAsociado.fromJson(Map<String, dynamic> json) {
+  // Named constructor for creating an instance from a map
+  factory SistemaAsociado.fromMap(Map<String, dynamic> map) {
     return SistemaAsociado(
-      id: json['id'] as String,
-      nombre: json['nombre'] as String,
+      id: map['id']?.toString() ?? '',
+      nombre: map['nombre']?.toString() ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() {
+  // Convert instance to map
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nombre': nombre,
     };
   }
+
+  // Named constructor for creating an instance from JSON string
+  factory SistemaAsociado.fromJson(String source) =>
+      SistemaAsociado.fromMap(json.decode(source));
+
+  // Convert instance to JSON string
+  String toJson() => json.encode(toMap());
 
   // Optional: copyWith method for immutability
   SistemaAsociado copyWith({

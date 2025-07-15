@@ -1,5 +1,4 @@
-
-import 'comportamiento.dart';
+import 'package:lensysapp/evaluacion/models/comportamiento.dart';
 
 class Principio {
   final String id;

@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../widgets/drawer_lensys.dart';
-
 /// Lista de etiquetas por hoja
 const List<String> sheetLabels = [
   'seguridad/medio ambiente/moral',
@@ -52,60 +50,53 @@ class _ShingoResultsScreenState extends State<ShingoResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Shingo Prize – Resultados'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
-          ),
-        ],
-      ),
-      endDrawer: const DrawerLensys(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: sheetLabels.map((label) {
-            return GestureDetector(
-              onTap: () async {
-                // ignore: unused_local_variable
-                final resultado = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ShingoResultSheet(
-                      title: label,
-                      initialData: hojasGuardadas[label]!,
-                    ),
-                  ),
-                );
-              
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                width: 200,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+      appBar: AppBar(title: const Text('Shingo Prize – Resultados')),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        children: sheetLabels.map((label) {
+          return GestureDetector(
+            onTap: () async {
+              final resultado = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ShingoResultSheet(
+                    title: label,
+                    initialData: hojasGuardadas[label]!,
                   ),
                 ),
               );
+              if (resultado != null && resultado is ShingoResultData) {
+                setState(() {
+                  hojasGuardadas[label] = resultado;
+                });
+              }
             },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              width: 200,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
           );
         }).toList(),
-      ),  
       ),
     );
   }
 }
+
 /// Hoja editable
 class ShingoResultSheet extends StatefulWidget {
   final String title;
@@ -231,7 +222,7 @@ class _ShingoResultSheetState extends State<ShingoResultSheet> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

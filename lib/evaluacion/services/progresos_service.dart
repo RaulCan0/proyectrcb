@@ -48,11 +48,7 @@ class ProgresosService {
     }
   }
 
-  /// Calcula el progreso de un principio a partir de comportamientos evaluados.
-  /// [totalComportamientos]: Total de comportamientos posibles.
-  /// [comportamientosEvaluados]: Número de comportamientos evaluados.
-  /// Retorna progreso normalizado entre 0.0 y 1.0.
-  double progresoPrincipio({
+  double progresoPorPrincipio({
     required int totalComportamientos,
     required int comportamientosEvaluados,
   }) {

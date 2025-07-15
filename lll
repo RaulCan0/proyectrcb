@@ -1,54 +1,68 @@
-📁 diagnostico/
+. Desfase con la base de datos Supabase
+Hallazgo	Evidencia	Impacto
+Tablas inexistentes: el servicio sigue consultando detalle_evaluacion, promedios_sistemas, etc.	services/supabase_service.dart, líneas ≈ 429-510	Todas las peticiones fallan con relation does not exist.
+Campos adicionales / tipos distintos en algunos modelos (p. ej. Dimension.id es String, pero tu esquema usa integer).	models/dimension.dart, models/calificacion.dart	Deserialización errática, casteos innecesarios.
+Calificacion.sistemas definido como List<String> sin conversión a array[text].	models/calificacion.dart	Inserciones disparan error de tipo o se guardan como JSON.
 
-models/
+⚙️ Qué hacer: Refactoriza SupabaseService para apuntar sólo a calificacion, asociados, empresas, sistemas_asociados y ajusta cada fromMap/toMap al esquema real (nombres snake_case, tipos nativos).
 
-empresa.dart
+2. Gestión de estado inconsistente
+14 providers (providers/…) cuando el requisito era un solo ScoreDashboardProvider.
 
-asociado.dart
+Mezclas provider clásico con llamadas pensadas para Riverpod (e.g. los ConsumerWidget que te pidió el profe nunca llegaron).
 
-calificacion.dart
+TextSizeProvider importado desde rutas diferentes (services-home/ vs perfil/), provocando el famoso ProviderNotFoundException.
 
-sistema.dart
+⚙️ Qué hacer:
 
-services/
+Migra todo a Riverpod o consolida en un único ChangeNotifier —pero no ambos.
 
-lensys_service.dart
+Declara ese provider en la raíz (ProviderScope o MultiProvider) y elimina los duplicados.
 
-providers/
+3. Flujo de navegación roto
+Origen → Destino	Problema detectado
+DimensionesScreen → TablaScoreGlobal	Push sin parámetros; la pantalla destino no sabe qué evaluación mostrar.
+TablaScoreGlobal → DetallesEvaluacion / Dashboard	Botones faltan; sólo hay un Center con texto “Implementa la obtención real…”.
+Regreso de ComportamientoEvaluacionScreen	No se ejecuta actualizarDato, por lo que la tabla de progreso no refresca.
 
-promedios_provider.dart
+4. Assets y JSON
+JSON inexistentes: se cargan assets/t1.json, t2.json, t3.json en JsonService, pero el ZIP no trae ninguno.
 
-global_score_provider.dart
+pubspec.yaml faltante en el ZIP, así que ni aunque existieran se incluirían en flutter_assets.
 
-progreso_provider.dart
+5. Código sin terminar / TODOs
+16 archivos contienen // TODO o // FIXME, entre ellos:
+principios_provider.dart, score_dashboard_provider.dart, tablas_screen.dart, etc.
+Muchos son bloques críticos (cálculo de promedios, validaciones, UI de gráficos).
 
-screens/
+6. Referencias de rutas inexistentes
+custom/appcolors.dart, widgets/endrawer_lensys.dart no están en la carpeta —lanzan error de import.
 
-empresas_screen.dart
+TablasDimensionScreen se cita en varios servicios pero la clase real vive como tablas_screen.dart (nombres cruzados).
 
-asociados_screen.dart
+Conclusión (0-100 %)
+Estado actual estimado ≈ 45 %
+El esqueleto está, pero con:
 
-dimensiones_screen.dart
+Conexiones fallidas a Supabase.
 
-principios_screen.dart (con botón Dashboard)
+Navegación y refresco de estado incompletos.
 
-comportamiento_evaluacion_screen.dart
+Falta de activos JSON y assets declarados.
 
-tablas_screen.dart
+Duplicidad de providers y ausencia del patrón MVVM unificado.
 
-tabla_score_screen.dart
+Próximos pasos (prioridad alta → baja)
+Alinear modelos y SupabaseService con las 5 tablas reales (breaking change más crítico).
 
-shingo_result_screen.dart
+Reducir a un solo provider (o migrar todo a Riverpod según lo que decidas).
 
-dashboard_screen.dart
+Completar assets JSON y declararlos en pubspec.yaml.
 
-historial_evaluaciones_screen.dart
+Terminar flujos de UI:
+Pasar evaluacionId, empresa y asociado al navegar;
+implementar ScoreGlobalService & dashboards.
 
-widgets/
+Limpiar TODOs / renombrar: garantizar que toda referencia de clase y ruta exista.
 
-sistemas_asociados.dart
-
-drawerlensys
-
-
-perfilscreen,homescreen,themeprovidery ytextsize no son parte de pero escucjraran sus cambios porque ya son parte de mi app e¿genetal
+Pruebas unitarias rápidas en servicios de cálculo (promedios, progresos) para evitar regresiones.
