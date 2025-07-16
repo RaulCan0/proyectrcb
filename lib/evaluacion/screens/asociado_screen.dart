@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lensysapp/chat/chat_screen.dart';
 import 'package:lensysapp/custom/appcolors.dart';
+import 'package:lensysapp/evaluacion/services/dimension_service.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/asociado.dart';
@@ -11,13 +12,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 
 class AsociadoScreen extends StatefulWidget {
-  final String empresaId;
+  final String empresa;
   final String dimensionId;
   final String evaluacionId;
 
   const AsociadoScreen({
     super.key,
-    required this.empresaId,
+    required this.empresa,
     required this.dimensionId,
     required this.evaluacionId,
   });
@@ -48,14 +49,15 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
 
   Future<void> _cargarAsociados() async {
     try {
-      final asociadosCargados = await _supabaseService.obtenerAsociadosPorEmpresa(widget.empresaId);
+      final asociadosCargados = await _supabaseService.obtenerAsociadosPorEmpresa(widget.empresa);
       ejecutivos.clear();
       gerentes.clear();
       miembros.clear();
 
+ 
       for (final asociado in asociadosCargados) {
         final progreso = await _supabaseService.obtenerProgresoAsociado(
-          idEmpresa: widget.empresaId,
+          idEmpresa: widget.empresa,
           idAsociado: asociado.id,
           idDimension: widget.dimensionId,
         );
@@ -171,7 +173,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
                 id: nuevoId,
                 nombre: nombre,
                 cargo: cargoSeleccionado.toLowerCase(),
-                empresaId: widget.empresaId,
+                empresa: widget.empresa,
                 empleadosAsociados: [],
                 progresoDimensiones: {},
                 comportamientosEvaluados: {},
@@ -183,7 +185,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
                   'id': nuevoId,
                   'nombre': nombre,
                   'cargo': cargoSeleccionado.toLowerCase(),
-                  'empresa_id': widget.empresaId,
+                  'empresa_id': widget.empresa,
                   'dimension_id': widget.dimensionId,
                   'antiguedad': antiguedad,
                 });
@@ -322,7 +324,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
       key: _scaffoldKeyAsociado,
@@ -336,7 +338,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
         ),
         title: Center(
           child: Text(
-            ' ${widget.empresaId}',
+            DimensionService.nombrePorId(widget.dimensionId),
             style: GoogleFonts.roboto(color: Colors.white),
           ),
         ),
@@ -387,5 +389,5 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
         child: const Icon(Icons.add, size: 25, color: Colors.white),
       ),
     );
-  }}
-  
+  }
+}

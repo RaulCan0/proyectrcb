@@ -75,7 +75,7 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
           evaluacionId: args['evaluacionId'],
           dimensionId: args['dimensionId'],
           empresaId: args['empresaId'],
-          asociadoId: args['asociadoId'], dimension: '',
+          asociadoId: args['asociadoId'],
         ),
       );
     }

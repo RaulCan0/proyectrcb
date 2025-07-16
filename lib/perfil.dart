@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/chat/chat_screen.dart';
+
 import 'package:lensysapp/home/text_size_provider.dart';
+import 'package:lensysapp/home/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-
-class ThemeProvider extends ChangeNotifier {
-  bool _isDarkMode = false;
-  bool get isDarkMode => _isDarkMode;
-
-  void toggleTheme() {
-    _isDarkMode = !_isDarkMode;
-    notifyListeners();
-  }
-}
 
 
 class PerfilScreen extends StatefulWidget {

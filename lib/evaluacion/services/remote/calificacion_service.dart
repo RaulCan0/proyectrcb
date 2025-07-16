@@ -1,7 +1,6 @@
 
 import 'package:lensysapp/evaluacion/models/calificacion.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
-
  
 class CalificacionService {
   final SupabaseService _remote = SupabaseService();

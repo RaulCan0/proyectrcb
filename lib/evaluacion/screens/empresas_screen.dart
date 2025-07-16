@@ -75,19 +75,23 @@ class _EmpresasScreenState extends State<EmpresasScreen> {
       key: _scaffoldKey,
       endDrawer: const DrawerLensys(),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF003056),
-        centerTitle: true,
-        title: const Text(
-          'LensysApp',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
-          ),
-        ],
-      ),
+  backgroundColor: const Color(0xFF003056),
+  centerTitle: true,
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: Colors.white),
+    onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+  ),
+  title: const Text(
+    'LensysApp',
+    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+  ),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.menu, color: Colors.white),
+      onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
+    ),
+  ],
+),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: isLoading

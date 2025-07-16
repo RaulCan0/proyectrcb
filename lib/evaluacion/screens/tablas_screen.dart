@@ -46,6 +46,7 @@ class TablasDimensionScreen extends StatefulWidget {
     required int valor,
     required List<String> sistemas,
     required String dimensionId,
+    required String observaciones,
     required String asociadoId,
   }) async {
     final tablaDim = tablaDatos.putIfAbsent(dimension, () => {});
@@ -70,6 +71,7 @@ class TablasDimensionScreen extends StatefulWidget {
         'valor': valor,
         'sistemas': sistemas,
         'dimension_id': dimensionId,
+        'observaciones': observaciones,
         'asociado_id': asociadoId,
       });
     }
@@ -86,6 +88,14 @@ class TablasDimensionScreen extends StatefulWidget {
 }
 
 class _TablasDimensionScreenState extends State<TablasDimensionScreen> with TickerProviderStateMixin {
+  @override
+  void dispose() {
+    TablasDimensionScreen.dataChanged.removeListener(_onDataChanged);
+    if (_providerListenerAdded) {
+      Provider.of<DatosProvider>(context, listen: false).removeListener(_onDataChanged);
+    }
+    super.dispose();
+  }
   final Map<String, String> dimensionInterna = {
     'IMPULSORES CULTURALES': 'Dimensión 1',
     'MEJORA CONTINUA': 'Dimensión 2',
@@ -93,7 +103,7 @@ class _TablasDimensionScreenState extends State<TablasDimensionScreen> with Tick
   };
 
   late List<String> dimensiones;
-  bool _providerListenerAdded = false;
+  final bool _providerListenerAdded = false;
 
   @override
   void initState() {
@@ -102,14 +112,6 @@ class _TablasDimensionScreenState extends State<TablasDimensionScreen> with Tick
     dimensiones = dimensionInterna.keys.toList();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_providerListenerAdded) {
-      Provider.of<DatosProvider>(context, listen: false).addListener(_onDataChanged);
-      _providerListenerAdded = true;
-    }
-  }
 
  
 
@@ -130,9 +132,11 @@ class _TablasDimensionScreenState extends State<TablasDimensionScreen> with Tick
           ),
           iconTheme: const IconThemeData(color: Colors.white),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              ),
             ),
           ],
           bottom: TabBar(

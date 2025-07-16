@@ -176,29 +176,7 @@ class DrawerLensys extends StatelessWidget {
             ),
             const Divider(),
             // Selector de tamaño de letra
-            ListTile(
-              leading: Icon(Icons.text_fields, color: Theme.of(context).iconTheme.color, size: 24 * scaleFactor),
-              title: Text('Letra', style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),
-              trailing: DropdownButton<double>(
-                value: textSizeProvider.fontSize,
-                iconSize: 24 * scaleFactor,
-                items: [
-                  DropdownMenuItem(value: 12.0, child: Text('CH', style: TextStyle(fontSize: 12 * scaleFactor))),
-                  DropdownMenuItem(value: 14.0, child: Text('M', style: TextStyle(fontSize: 14 * scaleFactor))),
-                  DropdownMenuItem(value: 16.0, child: Text('G', style: TextStyle(fontSize: 16 * scaleFactor))),
-                ],
-                onChanged: (size) {
-                  if (size != null) {
-                    textSizeProvider.setOption(size == 12.0
-                        ? TextSizeOption.ch
-                        : size == 14.0
-                            ? TextSizeOption.m
-                            : TextSizeOption.g);
-                  }
-                },
-              ),
-            ),
-            const Divider(),
+            
             ListTile(
               leading: Icon(Icons.logout, color: Colors.red, size: 24 * scaleFactor),
               title: Text("Cerrar sesión", style: TextStyle(fontSize: 14 * scaleFactor, color: Theme.of(context).textTheme.bodyLarge?.color)),

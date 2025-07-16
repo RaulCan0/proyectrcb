@@ -1,10 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:lensysapp/evaluacion/models/score_cargo.dart';
+import 'package:lensysapp/evaluacion/services/tabla_score_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/empresa.dart';
-import '../services/tabla_score_service.dart';
 
 class ScoreGlobalProvider with ChangeNotifier {
   final _client = Supabase.instance.client;
@@ -14,9 +13,6 @@ class ScoreGlobalProvider with ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-
-  Stream<ScoreGlobal?>? _scoreStream;
-  Stream<ScoreGlobal?>? get scoreStream => _scoreStream;
 
   StreamSubscription? _subscription;
 
@@ -30,13 +26,13 @@ class ScoreGlobalProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _scoreStream = _client
+    final stream = _client
         .from('calificacion')
         .stream(primaryKey: ['id'])
         .eq('empresa_id', empresa.id)
         .map(_calcularScore);
 
-    _subscription = _scoreStream!.listen((score) {
+    _subscription = stream.listen((score) {
       _scoreGlobal = score;
       _isLoading = false;
       notifyListeners();
@@ -53,6 +49,7 @@ class ScoreGlobalProvider with ChangeNotifier {
       'Mejora Continua': [70, 105, 175],
       'Alineamiento Empresarial': [110, 60, 30],
     };
+
     final Map<int, List<Map<String, dynamic>>> porCargo = {1: [], 2: [], 3: []};
     for (final entry in event) {
       final cargo = entry['cargo'];
@@ -60,20 +57,17 @@ class ScoreGlobalProvider with ChangeNotifier {
         porCargo[cargo]!.add(entry);
       }
     }
+
     List<ScoreCargo> scores = [];
     for (final dimension in pesos.keys) {
       final peso = pesos[dimension]!;
       for (int cargo = 1; cargo <= 3; cargo++) {
-        final califs = porCargo[cargo]!
-            .where((c) => c['dimension'] == dimension)
-            .toList();
-        final puntosObtenidos =
-            califs.fold<int>(0, (sum, e) => sum + (e['puntaje'] ?? 0) as int);
+        final califs = porCargo[cargo]!.where((c) => c['dimension'] == dimension).toList();
+        final puntosObtenidos = califs.fold<int>(0, (sum, e) => sum + (e['puntaje'] ?? 0) as int);
         final puntosPosibles = califs.length * 5;
-        final porcentaje = puntosPosibles > 0
-            ? (puntosObtenidos / puntosPosibles) * 100
-            : 0.0;
+        final porcentaje = puntosPosibles > 0 ? (puntosObtenidos / puntosPosibles) * 100 : 0.0;
         final ponderado = ((porcentaje / 100) * peso[cargo - 1]).round();
+
         scores.add(ScoreCargo(
           cargo: cargo,
           puntosObtenidos: ponderado,
@@ -82,6 +76,10 @@ class ScoreGlobalProvider with ChangeNotifier {
         ));
       }
     }
-    return ScoreGlobal(empresaId: event.isNotEmpty ? event.first['empresa_id'] : '', scorePorCargo: scores);
+
+    return ScoreGlobal(
+      empresaId: event.isNotEmpty ? event.first['empresa_id'] : '',
+      scorePorCargo: scores,
+    );
   }
 }

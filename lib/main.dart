@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/evaluacion/providers/datos_provider.dart';
 import 'package:lensysapp/home/text_size_provider.dart';
+import 'package:lensysapp/home/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 // Configuración Supabase
 import 'package:lensysapp/custom/configurations.dart';
 
-import 'package:lensysapp/perfil.dart';
 import 'package:lensysapp/custom/routes.dart';
 // Providers
 import 'package:lensysapp/evaluacion/providers/empresas.dart';

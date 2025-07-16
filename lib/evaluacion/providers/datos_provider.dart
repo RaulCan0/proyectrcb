@@ -25,6 +25,7 @@ class DatosProvider with ChangeNotifier {
     required List<String> sistemas,
     required String dimensionId,
     required String asociadoId,
+    required String observaciones,
   }) async {
     await TablasDimensionScreen.actualizarDato(
       evaluacionId,
@@ -36,6 +37,7 @@ class DatosProvider with ChangeNotifier {
       sistemas: sistemas,
       dimensionId: dimensionId,
       asociadoId: asociadoId,
+      observaciones: observaciones,
     );
     notifyListeners();
   }

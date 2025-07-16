@@ -7,6 +7,7 @@ import 'package:lensysapp/evaluacion/models/principio_json.dart';
 import 'package:lensysapp/evaluacion/services/json_service.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
+import 'package:lensysapp/evaluacion/screens/tablas_screen.dart';
 import 'comportamiento_evaluacion_screen.dart';
 
 class PrincipiosScreen extends StatefulWidget {
@@ -50,13 +51,12 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
   @override
   void initState() {
     super.initState();
-    cargarDatos(); // Llama a una nueva función que carga todo
+    cargarDatos();
   }
 
   Future<void> cargarDatos() async {
     setState(() => cargando = true);
     try {
-      // Cargar principios
       final List<dynamic> datosJson = await JsonService.cargarJson('t${widget.dimensionId}.json');
       if (datosJson.isEmpty) throw Exception('El archivo JSON de principios está vacío.');
 
@@ -69,10 +69,8 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
       for (var p in principiosFiltrados) {
         agrupados.putIfAbsent(p.nombre.trim(), () => []).add(p);
       }
-      // Elimina principios con lista vacía
       agrupados.removeWhere((key, value) => value.isEmpty);
 
-      // Cargar calificaciones existentes usando el método disponible y filtrando
       final todasLasCalificacionesDelAsociado = await _supabaseService.getCalificacionesPorAsociado(widget.asociado.id);
 
       final tempComportamientosEvaluados = <String>[];
@@ -80,7 +78,7 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
       final int dimensionIdActual = int.tryParse(widget.dimensionId) ?? 1;
 
       for (var cal in todasLasCalificacionesDelAsociado) {
-        if (cal.idDimension == dimensionIdActual) { // Filtrar por la dimensión actual
+        if (cal.idDimension == dimensionIdActual) {
           tempComportamientosEvaluados.add(cal.comportamiento);
           tempCalificacionesExistentes[cal.comportamiento] = cal;
         }
@@ -95,20 +93,11 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
     } catch (e) {
       debugPrint('Error al cargar datos: $e');
       if (mounted) {
-        setState(() => cargando = false); // Asegúrate de detener la carga en caso de error
+        setState(() => cargando = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al cargar datos: $e')),
         );
       }
-    }
-  }
-
-  void agregarComportamientoEvaluado(String comportamiento, Calificacion calificacion) {
-    if (!comportamientosEvaluados.contains(comportamiento)) {
-      setState(() {
-        comportamientosEvaluados.add(comportamiento);
-        calificacionesExistentes[comportamiento] = calificacion; // Guardar la calificación completa
-      });
     }
   }
 
@@ -126,7 +115,28 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
         ),
         backgroundColor: isDarkMode ? Colors.black : AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.table_chart, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TablasDimensionScreen(
+                    empresa: widget.empresa,
+                    evaluacionId: widget.evaluacionId,
+                    asociadoId: widget.asociado.id,
+                    empresaId: widget.empresa.id,
+                    dimension: nombreDimension(widget.dimensionId),
+                  ),
+                ),
+              );
+            },
+          ),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
@@ -152,13 +162,13 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: Center(
                             child: Text(
-                                'EVALUANDO A: ${widget.asociado.nombre}\nNivel Organizacional: ${widget.asociado.cargo.toLowerCase() == 'miembro' ? 'MIEMBRO DE EQUIPO' : widget.asociado.cargo.toUpperCase()}',
-                                style: TextStyle(
-                                fontSize: 15, 
-                                fontFamily: 'Roboto', 
+                              'EVALUANDO A: ${widget.asociado.nombre}\nNivel Organizacional: ${widget.asociado.cargo.toLowerCase() == 'miembro' ? 'MIEMBRO DE EQUIPO' : widget.asociado.cargo.toUpperCase()}',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontFamily: 'Roboto',
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, // Esto se mantiene dinámico según el tema
-                                ),
+                                color: isDarkMode ? Colors.white : Colors.black87,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -169,7 +179,7 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                           itemCount: principiosUnicos.length,
                           itemBuilder: (context, index) {
                             final entry = principiosUnicos.entries.elementAt(index);
-                            final screenSize = MediaQuery.of(context).size; // <-- Add this line
+                            final screenSize = MediaQuery.of(context).size;
                             return StatefulBuilder(
                               builder: (context, setStateTile) {
                                 final totalComportamientos = entry.value.length;
@@ -184,21 +194,26 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
                                     color: Color.lerp(const Color.fromARGB(255, 184, 179, 179), const Color.fromARGB(255, 154, 218, 156), progreso),
-                                     border: Border.all(
-                                      color: const Color.fromARGB(255, 0, 0, 0), // color del contorno
-                                       width: 2,),
+                                    border: Border.all(
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                      width: 2,
+                                    ),
                                     boxShadow: [
-                                      // ignore: deprecated_member_use
-                                      BoxShadow(color: const Color.fromARGB(255, 199, 194, 194).withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 3)),
+                                      BoxShadow(
+                                        // ignore: deprecated_member_use
+                                        color: const Color.fromARGB(255, 199, 194, 194).withOpacity(0.05),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
                                     ],
                                   ),
                                   child: ExpansionTile(
                                     tilePadding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.04, vertical: screenSize.height * 0.02),
                                     childrenPadding: const EdgeInsets.only(bottom: 10),
-                                    iconColor: Colors.black, 
-                                    collapsedIconColor: Colors.black, // Añade esta línea para el estado colapsado
+                                    iconColor: Colors.black,
+                                    collapsedIconColor: Colors.black,
                                     title: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center, // Centra el contenido de la columna
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Text(
                                           entry.key,
@@ -206,13 +221,13 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.black,  // Siempre negro
+                                            color: Colors.black,
                                           ),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
                                           '$evaluados de $totalComportamientos comportamientos evaluados',
-                                          style: const TextStyle(fontSize: 14, color: Colors.black87), // Siempre gris oscuro
+                                          style: const TextStyle(fontSize: 14, color: Colors.black87),
                                           textAlign: TextAlign.center,
                                         ),
                                       ],
@@ -224,7 +239,7 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                                       return ListTile(
                                         title: Text(
                                           comportamientoNombre,
-                                          textAlign: TextAlign.center, // Centrar título
+                                          textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: comportamientosEvaluados.contains(comportamientoNombre) ? const Color.fromARGB(255, 79, 109, 80) : Colors.black,
                                             fontWeight: comportamientosEvaluados.contains(comportamientoNombre) ? FontWeight.bold : FontWeight.normal,
@@ -234,35 +249,28 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                                           principio.benchmarkComportamiento.split(":").last.trim(),
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(color: Colors.black),
-                                        
                                         ),
                                         trailing: const Icon(
                                           Icons.arrow_forward_ios,
                                           color: Colors.black,
                                         ),
                                         onTap: () async {
-                                         
-
-                                          final String evaluacionIdGeneral = widget.asociado.id; // Placeholder, ajusta según tu lógica de ID de evaluación.
-
                                           final resultado = await Navigator.push<String>(
                                             context,
                                             MaterialPageRoute(
                                               builder: (_) => ComportamientoEvaluacionScreen(
                                                 cargo: widget.asociado.cargo,
-                                                evaluacionId: evaluacionIdGeneral, // Usar el ID de evaluación general
+                                                evaluacionId: widget.evaluacionId,
                                                 dimensionId: widget.dimensionId,
                                                 empresaId: widget.empresa.id,
                                                 asociadoId: widget.asociado.id,
                                                 calificacionExistente: calificacionActual,
-                                                principio: principio,
-                                                dimension: entry.key,
+                                                principio: principio, 
                                               ),
                                             ),
                                           );
-                                          // Después de volver, recargar los datos para reflejar cualquier cambio.
                                           if (resultado != null) {
-                                            cargarDatos(); // Recargar todos los datos para asegurar consistencia
+                                            cargarDatos();
                                           }
                                         },
                                       );
