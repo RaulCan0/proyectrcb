@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lensysapp/auth/login.dart';
-import 'package:lensysapp/services-home/auth.dart';
+import 'package:lensysapp/auth/auth.dart';
 import '../custom/appcolors.dart';
 
 

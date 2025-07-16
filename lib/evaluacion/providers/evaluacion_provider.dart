@@ -7,12 +7,18 @@ class EvaluacionesProvider with ChangeNotifier {
   List<Evaluacion> evaluaciones = [];
   bool isLoading = false;
 
-  Future<void> cargarEvaluaciones(String empresaId) async {
-    isLoading = true;
-    notifyListeners();
-    final response = await _client.from('detalles_evaluacion').select().eq('empresa_id', empresaId);
+ Future<void> cargarEvaluaciones(String empresaId) async {
+  isLoading = true;
+  notifyListeners();
+  try {
+    final response = await _client.from('evaluacion').select().eq('empresa_id', empresaId);
     evaluaciones = (response as List).map((e) => Evaluacion.fromMap(e)).toList();
+  } catch (e) {
+    evaluaciones = [];
+    debugPrint('Error al cargar evaluaciones: $e');
+  } finally {
     isLoading = false;
     notifyListeners();
   }
+}
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
-import 'package:lensysapp/services-home/theme_provider.dart';
+import 'package:lensysapp/home/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/grouped_bar_chart.dart';
 import '../widgets/horizontal_bar_systems_chart.dart';

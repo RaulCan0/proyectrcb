@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:lensysapp/models-home/message.dart';
+import 'package:lensysapp/chat/message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 

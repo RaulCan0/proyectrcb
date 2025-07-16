@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
-import 'package:lensysapp/services-home/text_size_provider.dart';
+import 'package:lensysapp/home/text_size_provider.dart';
 import 'package:provider/provider.dart';
 
 class TablaScoreGlobal extends StatelessWidget {

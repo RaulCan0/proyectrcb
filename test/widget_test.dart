@@ -7,8 +7,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lensysapp/services-home/text_size_provider.dart';
-import 'package:lensysapp/services-home/theme_provider.dart';
+import 'package:lensysapp/home/text_size_provider.dart';
+import 'package:lensysapp/home/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:lensysapp/evaluacion/providers/score_global_provider.dart';
 import 'package:lensysapp/evaluacion/providers/empresas.dart';

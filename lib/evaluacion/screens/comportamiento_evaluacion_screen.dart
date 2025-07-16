@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lensysapp/custom/appcolors.dart';
+import 'package:lensysapp/evaluacion/models/principio_json.dart';
 import 'package:lensysapp/evaluacion/widgets/sistema_selector.dart';
 import 'package:uuid/uuid.dart';
 import 'package:lensysapp/evaluacion/models/calificacion.dart';
@@ -45,7 +46,7 @@ const Map<String, String> sistemasRecomendadosPorComportamiento = {
 
 
 class ComportamientoEvaluacionScreen extends StatefulWidget {
-  final String principio;
+  final PrincipioJson principio;
   final String cargo;
   final String evaluacionId;
   final String dimensionId;
@@ -61,7 +62,7 @@ class ComportamientoEvaluacionScreen extends StatefulWidget {
     required this.dimensionId,
     required this.empresaId,
     required this.asociadoId,
-    this.calificacionExistente,
+    this.calificacionExistente, required String dimension,
   });
 
   @override
@@ -144,7 +145,7 @@ class _ComportamientoEvaluacionScreenState extends State<ComportamientoEvaluacio
         idAsociado: widget.asociadoId,
         idEmpresa: widget.empresaId,
         idDimension: int.tryParse(widget.dimensionId),
-        comportamiento: widget.principio,
+        comportamiento: widget.principio.nombre,
         puntaje: calificacion,
         fechaEvaluacion: DateTime.now(),
         observaciones: obs,

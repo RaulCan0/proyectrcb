@@ -48,16 +48,16 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
 
   Future<void> _cargarAsociados() async {
     try {
-      final asociadosCargados = await _supabaseService.getAsociadosPorEmpresa(widget.empresaId);
+      final asociadosCargados = await _supabaseService.obtenerAsociadosPorEmpresa(widget.empresaId);
       ejecutivos.clear();
       gerentes.clear();
       miembros.clear();
 
       for (final asociado in asociadosCargados) {
         final progreso = await _supabaseService.obtenerProgresoAsociado(
-          evaluacionId: widget.evaluacionId,
-          asociadoId: asociado.id,
-          dimensionId: widget.dimensionId,
+          idEmpresa: widget.empresaId,
+          idAsociado: asociado.id,
+          idDimension: widget.dimensionId,
         );
         progresoAsociado[asociado.id] = progreso;
 

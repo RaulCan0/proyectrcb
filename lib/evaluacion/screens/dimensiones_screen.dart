@@ -5,9 +5,8 @@ import 'package:lensysapp/evaluacion/screens/asociado_screen.dart';
 import 'package:lensysapp/evaluacion/screens/shingo_result.dart';
 import 'package:lensysapp/evaluacion/screens/tabla_score_global.dart';
 import 'package:lensysapp/evaluacion/services/evaluacion_service.dart';
+import 'package:lensysapp/evaluacion/services/progresos_service.dart';
 import 'package:lensysapp/evaluacion/widgets/drawer_lensys.dart';
-
-import '../services/progresos_service.dart';
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 class DimensionesScreen extends StatefulWidget {
@@ -58,7 +57,7 @@ class _DimensionesScreenState extends State<DimensionesScreen> with RouteAware {
     },
     {
       'id': '5',
-      'nombre': 'EVALUACION FINAL',
+      'nombre': 'EVALUACIÓN FINAL',
       'icono': Icons.score,
       'color': const Color.fromARGB(255, 5, 10, 14),
       'navigate': (BuildContext context) => Navigator.push(
@@ -114,12 +113,12 @@ class _DimensionesScreenState extends State<DimensionesScreen> with RouteAware {
                   dimension['nombre'],
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: FutureBuilder<double>(
-                  future: ProgresosService().progresoDimension(
-                    empresaId: widget.empresa.id,
-                    dimensionId: dimension['id'],
-                  ),
-                  builder: (context, snapshot) {
+                    subtitle: FutureBuilder<double>(
+                      future: ProgresosService().progresodimension(
+                        idempresa: widget.empresa.id,
+                        iddimension: dimension['id'],
+                      ),
+                      builder: (context, snapshot) {
                     final progreso = (snapshot.data ?? 0.0).clamp(0.0, 1.0);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

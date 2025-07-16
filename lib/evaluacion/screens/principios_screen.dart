@@ -249,13 +249,14 @@ class _PrincipiosScreenState extends State<PrincipiosScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (_) => ComportamientoEvaluacionScreen(
-                                                principio: principio.nombre,
                                                 cargo: widget.asociado.cargo,
                                                 evaluacionId: evaluacionIdGeneral, // Usar el ID de evaluación general
                                                 dimensionId: widget.dimensionId,
                                                 empresaId: widget.empresa.id,
                                                 asociadoId: widget.asociado.id,
                                                 calificacionExistente: calificacionActual,
+                                                principio: principio,
+                                                dimension: entry.key,
                                               ),
                                             ),
                                           );

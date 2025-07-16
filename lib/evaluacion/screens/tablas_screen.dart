@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lensysapp/evaluacion/models/empresa.dart';
+import 'package:provider/provider.dart';
+import 'package:lensysapp/evaluacion/providers/datos_provider.dart';
 import '../widgets/drawer_lensys.dart';
 
 
@@ -91,6 +93,7 @@ class _TablasDimensionScreenState extends State<TablasDimensionScreen> with Tick
   };
 
   late List<String> dimensiones;
+  bool _providerListenerAdded = false;
 
   @override
   void initState() {
@@ -100,10 +103,15 @@ class _TablasDimensionScreenState extends State<TablasDimensionScreen> with Tick
   }
 
   @override
-  void dispose() {
-    TablasDimensionScreen.dataChanged.removeListener(_onDataChanged);
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_providerListenerAdded) {
+      Provider.of<DatosProvider>(context, listen: false).addListener(_onDataChanged);
+      _providerListenerAdded = true;
+    }
   }
+
+ 
 
   void _onDataChanged() => setState(() {});
 

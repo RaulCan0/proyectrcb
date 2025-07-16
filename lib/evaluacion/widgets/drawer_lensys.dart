@@ -5,6 +5,7 @@ import 'package:lensysapp/evaluacion/models/empresa.dart';
 import 'package:lensysapp/evaluacion/screens/dashboard_screen.dart';
 import 'package:lensysapp/evaluacion/screens/empresas_screen.dart';
 import 'package:lensysapp/evaluacion/screens/tablas_screen.dart';
+import 'package:lensysapp/home/text_size_provider.dart';
 import 'package:lensysapp/perfil.dart';
 import 'package:lensysapp/auth/loader.dart';
 import 'package:provider/provider.dart';

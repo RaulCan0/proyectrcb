@@ -1,7 +1,7 @@
 class PrincipioJson {
   final String nombre;
   final String benchmarkComportamiento;
-  final String benchmarkPorNivel;
+  final String benchmarkPorCargo;
   final String cargo;
   final String preguntas;
   final Map<String, String> calificaciones;
@@ -10,7 +10,7 @@ class PrincipioJson {
   PrincipioJson({
     required this.nombre,
     required this.benchmarkComportamiento,
-    required this.benchmarkPorNivel,
+    required this.benchmarkPorCargo,
     required this.cargo,
     required this.preguntas,
     required this.calificaciones,
@@ -21,7 +21,7 @@ class PrincipioJson {
     return PrincipioJson(
       nombre: json['PRINCIPIOS'] ?? '',
       benchmarkComportamiento: json['BENCHMARK DE COMPORTAMIENTOS'] ?? '',
-      benchmarkPorNivel: json['BENCHMARK POR NIVEL'] ?? '',
+      benchmarkPorCargo: json['BENCHMARK POR CARGO'] ?? '',
       cargo: json['CARGO'] ?? '',
       preguntas: json['GUÍA DE PREGUNTAS'] ?? '',
       calificaciones: {

@@ -42,5 +42,8 @@ flutter:
 
   assets:
     - assets/logo.webp
+    - assets/t1.json
+    - assets/t2.json
+    - assets/t3.json
     - assets/shingomodel.webp
     - assets/logoblanco.webp

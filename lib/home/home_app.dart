@@ -217,7 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: ConvexAppBar(
         backgroundColor: AppColors.primary,
         color: Colors.white70,
-        activeColor: Colors.white,
         style: TabStyle.react, // Prueba TabStyle.fixedCircle si deseas más curvatura
         items: const [
           TabItem(icon: Icons.logout, title: 'Cerrar Sesión'),

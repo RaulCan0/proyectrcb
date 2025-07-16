@@ -75,7 +75,8 @@ class SupabaseService {
   }
 
   // ASOCIADOS
-  Future<List<Asociado>> getAsociadosPorEmpresa(String empresaId) async {
+  /// Obtiene la lista de asociados de una empresa.
+  Future<List<Asociado>> obtenerAsociadosPorEmpresa(String empresaId) async {
     if (empresaId.isEmpty) return [];
     final response = await _client
         .from('asociados')
@@ -84,7 +85,8 @@ class SupabaseService {
     return (response as List).map((e) => Asociado.fromMap(e)).toList();
   }
 
-  Future<void> addAsociado(Asociado asociado) async {
+  /// Agrega un nuevo asociado a la base de datos.
+  Future<void> agregarAsociado(Asociado asociado) async {
     await _client.from('asociados').insert(asociado.toMap());
   }
 
@@ -102,22 +104,13 @@ class SupabaseService {
     return (response as List).map((e) => Evaluacion.fromMap(e)).toList();
   }
 
-  Future<Evaluacion> addEvaluacion(Evaluacion evaluacion) async {
-    if (evaluacion.id.isEmpty ||
-        evaluacion.empresaId.isEmpty ||
-        evaluacion.asociadoId.isEmpty) {
-      throw Exception('Todos los IDs son obligatorios');
-    }
-
-    final data =
-        await _client
-            .from('detalles_evaluacion')
-            .insert(evaluacion.toMap())
-            .select()
-            .single();
-
-    return Evaluacion.fromMap(data);
+  Future<void> addEvaluacion(Evaluacion evaluacion) async {
+  if (userId != 'o.paredes@lensys.com.mx' && userId != 'sistemas@lensys.com.mx') {
+    throw Exception('No autorizado para registrar evaluaciones');
   }
+  await _client.from('evaluacion').insert(evaluacion.toMap());
+}
+
 
   Future<void> updateEvaluacion(String id, Evaluacion evaluacion) async {
     await _client
@@ -544,41 +537,60 @@ class SupabaseService {
     )).toList();
   }
 
-  Future<double> obtenerProgresoAsociado({
-    required String evaluacionId,
-    required String asociadoId,
-    required String dimensionId,
+// ...existing code...
+
+  /// Calcula el progreso global de una dimensión para una empresa.
+  Future<double> obtenerProgresoDimension({
+    required String idEmpresa,
+    required String idDimension,
   }) async {
-    if (evaluacionId.isEmpty || asociadoId.isEmpty || dimensionId.isEmpty) return 0.0;
+    if (idEmpresa.isEmpty || idDimension.isEmpty) return 0.0;
     final response = await _client
         .from('calificaciones')
         .select('comportamiento')
-        .eq('id_asociado', asociadoId)
-        .eq('id_empresa', evaluacionId)
-        .eq('id_dimension', int.tryParse(dimensionId) ?? -1);
+        .eq('id_empresa', idEmpresa)
+        .eq('id_dimension', int.tryParse(idDimension) ?? -1);
 
     final total = (response as List).length;
-    final mapaTotales = {'1': 6, '2': 14, '3': 8};
-    final totalDimension = mapaTotales[dimensionId] ?? 1;
+    const mapaTotales = {'1': 6, '2': 14, '3': 8};
+    final totalDimension = mapaTotales[idDimension] ?? 1;
     return total / totalDimension;
   }
 
-  Future<double> obtenerProgresoDimension(String empresaId, String dimensionId) async {
-    try {
-      final response = await _client
-          .from('calificaciones')
-          .select('comportamiento')
-          .eq('id_empresa', empresaId)
-          .eq('id_dimension', int.tryParse(dimensionId) ?? -1);
+  /// Calcula el progreso de un asociado en una dimensión específica.
+  Future<double> obtenerProgresoAsociado({
+    required String idEmpresa,
+    required String idAsociado,
+    required String idDimension,
+  }) async {
+    if (idEmpresa.isEmpty || idAsociado.isEmpty || idDimension.isEmpty) return 0.0;
+    final response = await _client
+        .from('calificaciones')
+        .select('comportamiento')
+        .eq('id_asociado', idAsociado)
+        .eq('id_empresa', idEmpresa)
+        .eq('id_dimension', int.tryParse(idDimension) ?? -1);
 
-      final total = (response as List).length;
-      const mapaTotales = {'1': 6, '2': 14, '3': 8};
-      final totalDimension = mapaTotales[dimensionId] ?? 1;
+    final total = (response as List).length;
+    const mapaTotales = {'1': 6, '2': 14, '3': 8};
+    final totalDimension = mapaTotales[idDimension] ?? 1;
+    return total / totalDimension;
+  }
 
-      return total / totalDimension;
-    } catch (e) {
-      return 0.0; // Return 0.0 in case of an error
-    }
+  /// Obtiene todas las calificaciones de un asociado (versión alternativa).
+  Future<List<Calificacion>> getCalificacionesPorAsociadoAlt(String idAsociado) async {
+    if (idAsociado.isEmpty) return [];
+    const String selectColumns =
+        'id, id_asociado, id_empresa, id_dimension, comportamiento, puntaje, fecha_evaluacion, observaciones, sistemas, evidencia_url';
+
+    final response = await _client
+        .from('calificaciones')
+        .select(selectColumns)
+        .eq('id_asociado', idAsociado);
+
+    return response
+        .map((item) => Calificacion.fromMap(item))
+        .toList();
   }
 
   Future<void> guardarEvaluacionDraft(String evaluacionId) async {

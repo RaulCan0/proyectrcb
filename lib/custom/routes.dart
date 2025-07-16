@@ -5,7 +5,7 @@ import 'package:lensysapp/auth/login.dart';
 import 'package:lensysapp/auth/register.dart';
 import 'package:lensysapp/auth/recovery.dart';
 import 'package:lensysapp/evaluacion/screens/detalles_evaluacion.dart';
-import 'package:lensysapp/home_app.dart';
+import 'package:lensysapp/home/home_app.dart';
 import 'package:lensysapp/perfil.dart';
 import 'package:lensysapp/evaluacion/screens/empresas_screen.dart';
 import 'package:lensysapp/evaluacion/screens/dimensiones_screen.dart';
@@ -75,7 +75,7 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
           evaluacionId: args['evaluacionId'],
           dimensionId: args['dimensionId'],
           empresaId: args['empresaId'],
-          asociadoId: args['asociadoId'],
+          asociadoId: args['asociadoId'], dimension: '',
         ),
       );
     }
