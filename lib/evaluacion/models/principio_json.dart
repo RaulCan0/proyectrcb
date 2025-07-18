@@ -1,8 +1,7 @@
 class PrincipioJson {
   final String nombre;
   final String benchmarkComportamiento;
-  final String benchmarkPorNivel;
-  final String cargo;
+  final String benchmarkPorCargo;
   final String preguntas;
   final Map<String, String> calificaciones;
   final List<String> comportamientos;
@@ -10,8 +9,7 @@ class PrincipioJson {
   PrincipioJson({
     required this.nombre,
     required this.benchmarkComportamiento,
-    required this.benchmarkPorNivel,
-    required this.cargo,
+    required this.benchmarkPorCargo,
     required this.preguntas,
     required this.calificaciones,
     required this.comportamientos,
@@ -21,8 +19,7 @@ class PrincipioJson {
     return PrincipioJson(
       nombre: json['PRINCIPIOS'] ?? '',
       benchmarkComportamiento: json['BENCHMARK DE COMPORTAMIENTOS'] ?? '',
-      benchmarkPorNivel: json['BENCHMARK POR NIVEL'] ?? '',
-      cargo: json['CARGO'] ?? '',
+      benchmarkPorCargo: json['BENCHMARK POR CARGO'] ?? '',
       preguntas: json['GUÍA DE PREGUNTAS'] ?? '',
       calificaciones: {
         'C1': json['C1'] ?? '',
@@ -31,10 +28,7 @@ class PrincipioJson {
         'C4': json['C4'] ?? '',
         'C5': json['C5'] ?? '',
       },
-      comportamientos:
-          json['comportamientos'] != null
-              ? List<String>.from(json['comportamientos'])
-              : [], // Si es null, asignamos una lista vacía
+      comportamientos: json['comportamientos'] != null ? List<String>.from(json['comportamientos']) : [],
     );
   }
 

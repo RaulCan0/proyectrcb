@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-
 enum TextSizeOption { ch, m, g }
 
 class TextSizeProvider with ChangeNotifier {

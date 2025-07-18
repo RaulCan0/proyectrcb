@@ -1,6 +1,4 @@
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 class Users {
   static Future<void> saveSession(String userId, String userName) async {
     final prefs = await SharedPreferences.getInstance();

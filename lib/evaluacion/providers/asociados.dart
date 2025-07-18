@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/asociado.dart';
@@ -7,7 +8,7 @@ class AsociadosProvider with ChangeNotifier {
   List<Asociado> asociados = [];
   bool isLoading = false;
 
-  Future<void> cargarAsociados(String empresaId) async {
+  Future<void> cargarAsociadosPorEmpresa(String empresaId) async {
     isLoading = true;
     notifyListeners();
     final response = await _client.from('asociados').select().eq('empresa_id', empresaId);

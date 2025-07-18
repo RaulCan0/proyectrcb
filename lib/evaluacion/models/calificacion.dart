@@ -11,6 +11,7 @@ class Calificacion {
   final String? observaciones;
   final String? sistemas;
   final String? evidenciaUrl;
+  final String cargo;
 
   Calificacion({
     required this.id,
@@ -23,6 +24,7 @@ class Calificacion {
     this.observaciones,
     this.sistemas,
     this.evidenciaUrl,
+    required this.cargo,
   });
 
   factory Calificacion.fromMap(Map<String, dynamic> map) {
@@ -37,6 +39,7 @@ class Calificacion {
       observaciones: map['observaciones'] as String?,
       sistemas: map['sistemas'] as String?,
       evidenciaUrl: map['evidencia_url'] as String?,
+      cargo: map['cargo'] as String? ?? '',
     );
   }
 
@@ -51,6 +54,7 @@ class Calificacion {
         'observaciones': observaciones,
         'sistemas': sistemas,
         'evidencia_url': evidenciaUrl,
+        'cargo': cargo,
       };
 
   factory Calificacion.fromJson(String source) {

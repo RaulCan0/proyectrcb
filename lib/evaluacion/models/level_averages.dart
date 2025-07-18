@@ -1,4 +1,5 @@
-class LevelAverages {
+
+class PromedioCargo{
   final int id;
   final String nombre;
   final double ejecutivo;
@@ -7,22 +8,22 @@ class LevelAverages {
   final int? dimensionId;
   final double general;
 
-  LevelAverages({
+  PromedioCargo({
     required this.id,
     required this.nombre,
     required this.ejecutivo,
     required this.gerente,
     required this.miembro,
     this.dimensionId,
-    double? general, required String cargo,
+    double? general,
   }) : general = general ?? ((ejecutivo + gerente + miembro) / 3.0);
 
-  factory LevelAverages.fromMap(Map<String, dynamic> map) {
+  factory PromedioCargo.fromMap(Map<String, dynamic> map) {
     final ejecutivo = (map['ejecutivo'] as num?)?.toDouble() ?? 0.0;
     final gerente = (map['gerente'] as num?)?.toDouble() ?? 0.0;
     final miembro = (map['miembro'] as num?)?.toDouble() ?? 0.0;
 
-    return LevelAverages(
+    return PromedioCargo(
       id: map['id'] as int,
       nombre: map['nombre'] as String,
       ejecutivo: ejecutivo,
@@ -31,7 +32,7 @@ class LevelAverages {
       dimensionId: map['dimensionId'] != null ? map['dimensionId'] as int : null,
       general: map['general'] != null
           ? (map['general'] as num).toDouble()
-          : ((ejecutivo + gerente + miembro) / 3.0), cargo: '',
+          : ((ejecutivo + gerente + miembro) / 3.0),
     );
   }
 

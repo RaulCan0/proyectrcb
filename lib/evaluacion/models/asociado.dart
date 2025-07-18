@@ -1,4 +1,5 @@
 
+
 class Asociado {
   final String id;
   final String nombre;

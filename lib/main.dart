@@ -8,7 +8,6 @@ import 'package:lensysapp/auth/register.dart';
 import 'package:lensysapp/custom/appcolors.dart';
 import 'package:lensysapp/custom/configurations.dart';
 import 'package:lensysapp/home_app.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {

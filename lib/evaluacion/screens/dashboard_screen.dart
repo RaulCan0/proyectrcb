@@ -38,16 +38,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadData() async {
     setState(() => _loading = true);
-    // Ejemplo: obtener empresaId actual (ajusta según tu lógica de sesión)
-    final empresaId = _supabaseService.userId ?? '';
+    // Debes pasar el empresaId desde la pantalla anterior o contexto
+    final empresaId = "AQUI_TU_EMPRESA_ID"; // <-- Reemplaza por el id real
     // RING: promedios por dimensión
-    final dimAverages = await _supabaseService.getDimensionAverages(empresaId);
+    final dimAverages = await _supabaseService.getPromediosDimension(empresaId);
     ringData = {
       for (var d in dimAverages)
         (d.nombre.isNotEmpty ? d.nombre : 'Dimensión'): d.general,
     };
     // SCATTER: ejemplo con principles
-    final principles = await _supabaseService.getPrinciplesAverages(empresaId);
+    final principles = await _supabaseService.getPromedioPrincipios(empresaId);
     scatterData = [
       for (var p in principles)
         ScatterData(
@@ -60,24 +60,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
     ];
     // GROUPED: ejemplo con comportamientos
-    final behaviors = await _supabaseService.getBehaviorAverages(empresaId);
-    groupedData = {};
-    for (var b in behaviors) {
-      groupedData[(b.nombre.isNotEmpty ? b.nombre : '')] = [b.ejecutivo, b.gerente, b.miembro];
-    }
+    // Si tienes un método para comportamientos, úsalo aquí
+    // final behaviors = await _supabaseService.getPromediosComportamientos(empresaId);
+    // groupedData = {};
+    // for (var b in behaviors) {
+    //   groupedData[(b.nombre.isNotEmpty ? b.nombre : '')] = [b.ejecutivo, b.gerente, b.miembro];
+    // }
     // SYSTEMS: ejemplo con sistemas
-    final systems = await _supabaseService.getSystemAverages(empresaId);
-    systemsData = {};
-    sistemasOrdenados = [];
-    for (var s in systems) {
-      final nombreSistema = (s.nombre.isNotEmpty ? s.nombre : '');
-      systemsData[nombreSistema] = {
-        'E': s.ejecutivo,
-        'G': s.gerente,
-        'M': s.miembro,
-      };
-      sistemasOrdenados.add(nombreSistema);
-    }
+    // final systems = await _supabaseService.getPromediosSistemas(empresaId);
+    // systemsData = {};
+    // sistemasOrdenados = [];
+    // for (var s in systems) {
+    //   final nombreSistema = (s.nombre.isNotEmpty ? s.nombre : '');
+    //   systemsData[nombreSistema] = {
+    //     'E': s.ejecutivo,
+    //     'G': s.gerente,
+    //     'M': s.miembro,
+    //   };
+    //   sistemasOrdenados.add(nombreSistema);
+    // }
     setState(() => _loading = false);
   }
 

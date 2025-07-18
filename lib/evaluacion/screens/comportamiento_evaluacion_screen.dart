@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'package:lensysapp/evaluacion/models/calificacion.dart';
 import 'package:lensysapp/evaluacion/services/supabase_service.dart';
 import '../widgets/tabla_rol_button.dart';
+import '../widgets/sistema_asociado.dart';
 import '../widgets/drawer_lensys.dart';
 
 class ComportamientoEvaluacionScreen extends StatefulWidget {
@@ -116,11 +117,12 @@ class _ComportamientoEvaluacionScreenState extends State<ComportamientoEvaluacio
         observaciones: obs,
         sistemas: sistemasSeleccionados.join(','),
         evidenciaUrl: evidenciaUrl,
+        cargo: widget.cargo,
       );
       if (widget.calificacionExistente != null) {
-        await _supabaseService.updateCalificacionFull(calObj);
+        await _supabaseService.addCalificacion(calObj);
       } else {
-        await _supabaseService.addCalificacion(calObj, id: calObj.id, idAsociado: widget.asociadoId);
+        await _supabaseService.addCalificacion(calObj);
       }
       if (mounted) Navigator.pop(context, widget.principio);
     } catch (e) {
@@ -176,9 +178,24 @@ class _ComportamientoEvaluacionScreenState extends State<ComportamientoEvaluacio
                   onPressed: isSaving
                       ? null
                       : () async {
-                          // Aquí deberías mostrar un selector de sistemas
-                          // Por ahora simulo selección
-                          await _saveSelectedSystems(['Sistema 1', 'Sistema 2']);
+                          // Mostrar el selector de sistemas y actualizar la selección
+                          final seleccionados = await showDialog<List<Map<String, dynamic>>>(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: SizedBox(
+                                width: 400,
+                                height: 420,
+                                child: SistemasScreen(
+                                  onSeleccionar: (sistemas) {
+                                    Navigator.pop(context, sistemas);
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
+                          if (seleccionados != null) {
+                            await _saveSelectedSystems(seleccionados.map((s) => s['nombre'] as String).toList());
+                          }
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

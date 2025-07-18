@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-/// Un anillo por cada entrada en [dataPoints], donde
-/// cada anillo muestra “filled / empty” sobre [totalPoints].
 class MultiRingChart extends StatelessWidget {
   /// Puntos obtenidos por categoría.
   final Map<String, double> dataPoints;

@@ -5,7 +5,6 @@ import 'package:lensysapp/evaluacion/screens/empresas_screen.dart';
 import 'package:lensysapp/perfil.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
