@@ -144,7 +144,7 @@ class _DimensionesScreenState extends State<DimensionesScreen> with RouteAware {
                     context,
                     MaterialPageRoute(
                       builder: (_) => AsociadoScreen(
-                        empresaId: widget.empresa.id,
+                        empresa: widget.empresa.id,
                         dimensionId: dimension['id'],
                         evaluacionId: widget.evaluacionId,
                       ),

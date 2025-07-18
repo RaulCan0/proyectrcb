@@ -173,7 +173,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
                 id: nuevoId,
                 nombre: nombre,
                 cargo: cargoSeleccionado.toLowerCase(),
-                empresa: widget.empresa,
+                empresaId: widget.empresa,
                 empleadosAsociados: [],
                 progresoDimensiones: {},
                 comportamientosEvaluados: {},
@@ -294,7 +294,7 @@ class _AsociadoScreenState extends State<AsociadoScreen> with SingleTickerProvid
                         MaterialPageRoute(
                           builder: (_) => PrincipiosScreen(
                             empresa: Empresa(
-                              id: widget.empresaId,
+                              id: widget.empresa,
                               nombre: '',
                               tamano: '',
                               empleadosTotal: 0,

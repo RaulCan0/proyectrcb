@@ -49,7 +49,7 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
       final args = settings.arguments as Map<String, dynamic>;
       return MaterialPageRoute(
         builder: (_) => AsociadoScreen(
-          empresaId: args['empresaId'],
+          empresa: args['empresaId'],
           dimensionId: args['dimensionId'],
           evaluacionId: args['evaluacionId'],
         ),
